@@ -31,5 +31,39 @@
 *.out
 *.app
 
-# User
+# Build Directories
+build
+bin
+*.dir
+
+# Visual Studio Clutter
+_ReSharper*
+*.sdf
+*.suo
+*.dir
+*.vcxproj*
+*.sln
 .vs
+CMakeSettings.json
+Win32
+x64
+Debug
+Release
+MinSizeRel
+RelWithDebInfo
+*.opensdf
+
+# MacOS Clutter
+.DS_Store
+
+# Makefile Generator Clutter
+Makefile
+
+# CMake Clutter
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+CMakeDoxyfile.in
+CMakeDoxygenDefaults.cmake
+cmake_install.cmake
+cmake_uninstall.cmake
