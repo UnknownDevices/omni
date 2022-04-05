@@ -36,6 +36,9 @@ build
 bin
 *.dir
 
+# Vs Code Clutter
+.vscode
+
 # Visual Studio Clutter
 _ReSharper*
 *.sdf

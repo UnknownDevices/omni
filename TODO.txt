@@ -1,0 +1,14 @@
+TODO: Put vendor's output dirs in vendor root folder
+
+TODO: Show example projects inside a root folder in the vs editor
+
+TODO: Rethink placement of header files; ex. only leave headers meant to be included by users in the
+include dir
+
+TODO: Warning: C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition [E:\Dev\omni\build\examples\sandbox\sandbox.vcxproj]
+E:\Dev\omni\build\vcpkg_installed\x64-windows\include\GLFW/glfw3.h(123): message : see previous definition of 'APIENTRY' [E:\Dev\omni\build\examples\sandbox\sandbox.vcxproj]
+
+[proc] Executing command: E:\Programs\CMake\bin\cmake.EXE --no-warn-unused-cli -DCMAKE_TOOLCHAIN_FILE:STRING=E:/Libraries/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -Se:/Dev/omni -Be:/Dev/omni/build -G "Visual Studio 17 2022" -A x64
+[cmake] Not searching for unused variables given on the command line.
+
+TODO: spdlog should only build required if building for debug

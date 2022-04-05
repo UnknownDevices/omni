@@ -1,0 +1,16 @@
+{
+  "name": "omni",
+  "version": "0.1.0",
+  "description": "Omni Engine",
+  "license": "MIT",
+  "dependencies": [
+    "glfw3",
+    "glad",
+    "glm",
+    "spdlog",
+    {
+      "name": "imgui",
+      "features": [ "glfw-binding", "opengl3-binding" ]
+    }
+  ]
+}
