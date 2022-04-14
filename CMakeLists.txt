@@ -21,6 +21,11 @@ else()
     message(FATAL_ERROR "Omni only supports Windows for the time being!")
 endif()
 
+# include(CMakeRC.cmake)
+# cmrc_add_resource_library(omni-rcs ALIAS omni::rcs NAMESPACE omni_rcs
+#     Assets/Icons/MainIcon.ico
+# )
+
 #----------------------------------------------------------------------------------
 # File inclusions
 #----------------------------------------------------------------------------------
@@ -29,12 +34,8 @@ list(APPEND H_OMNI_FILES
     omni/core.h
     #*.hpp
     omni/entry_point.hpp
-    omni/app.hpp
-    omni/target_platform_window.hpp
-    omni/window.hpp
-    omni/logger.hpp
-    omni/rendering_layer.hpp
-    omni/window_event.hpp
+    omni/omni.hpp
+    omni/dx12_window.hpp
     omni/utility/function.hpp
     omni/utility/types_pack.hpp
     omni/utility/values_pack.hpp
@@ -43,36 +44,32 @@ list(APPEND H_OMNI_FILES
 
 list(APPEND C_OMNI_FILES
     #*.cpp
-    omni/app.cpp
-    omni/logger.cpp
+    omni/dx12_window.cpp
+    omni/omni.cpp
 )
 
 if(OMNI_GEN_FOR_WINDOWS_PLATFORM)
     list(APPEND H_OMNI_FILES
-        #*.hpp
-        omni/platform/windows/windows_window.hpp
-        omni/imgui/imgui_demo_window.hpp
-        omni/imgui/imgui_impl.hpp
     )
 
     list(APPEND C_OMNI_FILES
-        #*.cpp
-        omni/platform/windows/windows_window.cpp
-        omni/imgui/imgui_demo_window.cpp
     )
 endif()
 #----------------------------------------------------------------------------------
 
-find_package(glad CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(imgui CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
+# find_package(glad CONFIG REQUIRED)
+# find_package(glfw3 CONFIG REQUIRED)
+# find_package(glm CONFIG REQUIRED)
+# find_package(imgui CONFIG REQUIRED)
+# find_package(sdl2 CONFIG REQUIRED)
+# find_package(sdl2-image CONFIG REQUIRED)
+# find_package(spdlog CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME} 
     SHARED
     ${H_OMNI_FILES}
     ${C_OMNI_FILES}
+    omni/resources.rc
 )
 
 if(OMNI_GEN_EXAMPLE_SANDBOX)
@@ -87,6 +84,8 @@ target_precompile_headers(${PROJECT_NAME}
     <coroutine>
     <vector>
     <array>
+    <fstream>
+    <streambuf>
     <set>
     <map>
     <unordered_set>
@@ -131,14 +130,17 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    PUBLIC    
-    glfw
-    spdlog::spdlog
-    imgui::imgui
-    glad::glad
-    opengl32.lib
-    PRIVATE
-    glm::glm
+    PUBLIC  
+    # omni::rcs  
+    # glfw
+    # spdlog::spdlog
+    # imgui::imgui
+    # glad::glad
+    # SDL2::SDL2
+    # SDL2::SDL2_image
+    # opengl32.lib
+    # PRIVATE
+    # glm::glm
 )
 
 configure_file(omni_config.h.in omni_config.h)

@@ -5,7 +5,6 @@
 #endif
 
 #define BIT_FLAG(x) (1 << (x))
-// #define NUMARGS(...) std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value
 
 typedef int8_t    int8;
 typedef int16_t   int16;

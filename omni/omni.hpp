@@ -1,2 +1,16 @@
+#pragma once  
+
+#include <Windows.h>
 #include <omni/core.h>
-#include <omni/entry_point.hpp>
+
+namespace Omni
+{
+    inline HINSTANCE s_exe_h_inst;
+	inline HINSTANCE s_omni_h_inst;
+
+    int16_fast OMNI_API
+    init();
+    
+    HMODULE OMNI_API
+    GetThisModuleHandle();
+}

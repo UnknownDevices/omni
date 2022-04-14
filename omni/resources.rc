@@ -1,0 +1,3 @@
+#include "resource.h"
+
+ICON_MAIN ICON "E:/Dev/omni/assets/icons/main_icon.ico"
