@@ -1,3 +1,6 @@
-#include "resource.h"
+#include <omni/resource.h>
+#include <omni_config.h>
 
-ICON_MAIN ICON "E:/Dev/omni/assets/icons/main_icon.ico"
+#define APPEND_TO_CURR_SOURCE_DIR(arg) CMAKE_CURRENT_SOURCE_DIR##arg
+
+ICON_MAIN ICON APPEND_TO_CURR_SOURCE_DIR(/assets/icons/main_icon.ico)
