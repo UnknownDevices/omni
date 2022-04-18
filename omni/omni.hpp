@@ -12,5 +12,5 @@ namespace Omni
     init();
     
     HMODULE OMNI_API
-    GetThisModuleHandle();
+    get_this_module_handle();
 }

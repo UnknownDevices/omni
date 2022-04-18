@@ -20,4 +20,3 @@ namespace Omni
 	    INT    m_height;
     };
 }
-

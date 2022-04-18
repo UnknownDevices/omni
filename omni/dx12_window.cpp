@@ -22,7 +22,7 @@ namespace Omni
 	{
 		using namespace Omni;
 
-		/* - Initialize Global Variables - */
+		/* - Initialize Variables - */
 
 		m_class_name        = "Omni Engine Class";
 		m_title             = "Omni Engine";

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <Windows.h>
 #include <omni/omni.hpp>
 #include <omni/dx12_window.hpp>
+#include <omni/logger.hpp>
 
-int CALLBACK
-WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+int
+wmain(int argc, wchar_t** argv)
 {
 	Omni::init();
+
 	Omni::Dx12_Window().run();
 
 	return 0;

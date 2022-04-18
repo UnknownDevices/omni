@@ -21,11 +21,6 @@ else()
     message(FATAL_ERROR "Omni only supports Windows for the time being!")
 endif()
 
-# include(CMakeRC.cmake)
-# cmrc_add_resource_library(omni-rcs ALIAS omni::rcs NAMESPACE omni_rcs
-#     Assets/Icons/MainIcon.ico
-# )
-
 #----------------------------------------------------------------------------------
 # File inclusions
 #----------------------------------------------------------------------------------
@@ -35,6 +30,7 @@ list(APPEND H_OMNI_FILES
     #*.hpp
     omni/entry_point.hpp
     omni/omni.hpp
+    omni/logger.hpp
     omni/dx12_window.hpp
     omni/utility/function.hpp
     omni/utility/types_pack.hpp
@@ -46,6 +42,7 @@ list(APPEND C_OMNI_FILES
     #*.cpp
     omni/dx12_window.cpp
     omni/omni.cpp
+    omni/logger.cpp
 )
 
 if(OMNI_GEN_FOR_WINDOWS_PLATFORM)
@@ -55,15 +52,11 @@ if(OMNI_GEN_FOR_WINDOWS_PLATFORM)
     list(APPEND C_OMNI_FILES
     )
 endif()
+
 #----------------------------------------------------------------------------------
 
-# find_package(glad CONFIG REQUIRED)
-# find_package(glfw3 CONFIG REQUIRED)
-# find_package(glm CONFIG REQUIRED)
-# find_package(imgui CONFIG REQUIRED)
-# find_package(sdl2 CONFIG REQUIRED)
-# find_package(sdl2-image CONFIG REQUIRED)
-# find_package(spdlog CONFIG REQUIRED)
+set(CXX_STANDARD 20)
+set(CXX_STANDARD_REQUIRED ON)
 
 add_library(${PROJECT_NAME} 
     SHARED
@@ -72,12 +65,16 @@ add_library(${PROJECT_NAME}
     omni/resources.rc
 )
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON) 
+
+add_subdirectory(vendor/spdlog)
+set_property(TARGET spdlog PROPERTY CXX_STANDARD 23)
+set_property(TARGET spdlog PROPERTY CXX_STANDARD_REQUIRED ON) 
+
 if(OMNI_GEN_EXAMPLE_SANDBOX)
     add_subdirectory(examples/sandbox)
 endif()
-
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_precompile_headers(${PROJECT_NAME} 
     PUBLIC
@@ -85,6 +82,7 @@ target_precompile_headers(${PROJECT_NAME}
     <vector>
     <array>
     <fstream>
+    <format>
     <streambuf>
     <set>
     <map>
@@ -131,16 +129,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC  
-    # omni::rcs  
-    # glfw
-    # spdlog::spdlog
-    # imgui::imgui
-    # glad::glad
-    # SDL2::SDL2
-    # SDL2::SDL2_image
-    # opengl32.lib
-    # PRIVATE
-    # glm::glm
+    spdlog::spdlog
 )
 
 configure_file(omni_config.h.in omni_config.h)
