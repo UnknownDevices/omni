@@ -34,45 +34,6 @@ namespace Omni
             case Logger::Level::error:
                 Logger::s_spdlog_logger->error(fmt, std::forward<Args>(args)...);
                 break;
-			case Logger::Level::critical:
-                Logger::s_spdlog_logger->critical(fmt, std::forward<Args>(args)...);
-                break;
         }
     }
-
-	template<typename ... Args> inline void
-    debug_log(std::string_view fmt, Args&& ... args)
-	{
-		log(Logger::Level::debug, std::move(fmt), std::forward<Args>(args)...);
-	}
-
-	template<typename ... Args> inline void
-    trace_log(std::string_view fmt, Args&& ... args)
-	{
-		log(Logger::Level::trace, std::move(fmt), std::forward<Args>(args)...);
-	}
-	
-	template<typename ... Args> inline void
-    info_log(std::string_view fmt, Args&& ... args)
-	{
-		log(Logger::Level::info, std::move(fmt), std::forward<Args>(args)...);
-	}
-	
-	template<typename ... Args> inline void
-    warn_log(std::string_view fmt, Args&& ... args)
-	{
-		log(Logger::Level::warn, std::move(fmt), std::forward<Args>(args)...);
-	}
-	
-	template<typename ... Args> inline void
-    error_log(std::string_view fmt, Args&& ... args)
-	{
-		log(Logger::Level::error, std::move(fmt), std::forward<Args>(args)...);
-	}
-	
-	template<typename ... Args> inline void
-    critical_log(std::string_view fmt, Args&& ... args)
-	{
-		log(Logger::Level::critical, std::move(fmt), std::forward<Args>(args)...);
-	}
 }
