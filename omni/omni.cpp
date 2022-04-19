@@ -13,7 +13,7 @@ namespace Omni
 		s_exe_h_inst  = GetModuleHandle(NULL);
 		s_omni_h_inst = get_this_module_handle();
 
-        log(Logger::Level::trace, "Omni::init returning successfully...");
+        trace_log("Omni Initialized Successfully...");
         return 0;
     }
 

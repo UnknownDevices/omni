@@ -2,6 +2,7 @@
 
 #include <omni/resource.h>
 #include <omni/omni.hpp>
+#include <omni/logger.hpp>
 
 namespace Omni
 {
@@ -52,7 +53,7 @@ namespace Omni
 		HWND h_wnd = CreateWindow(m_class_name, m_title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0,
 			m_width, m_height, nullptr, nullptr, s_omni_h_inst, nullptr);
 		if (!h_wnd) {
-			MessageBox(0, "Failed to Create Window!", 0, 0);
+			error_log("Failed to Create Window");
 			return;
 		}
 

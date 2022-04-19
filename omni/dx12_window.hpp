@@ -11,7 +11,8 @@ namespace Omni
     	static LRESULT CALLBACK 
 	    WindowProc(HWND h_wnd, UINT msg_type, WPARAM w_param, LPARAM l_param);
 
-        void run();
+        void 
+        run();
 
     private:
         LPCSTR m_class_name;
