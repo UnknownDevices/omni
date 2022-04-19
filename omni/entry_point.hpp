@@ -8,8 +8,8 @@ int
 wmain(int argc, wchar_t** argv)
 {
 	Omni::init();
-
 	Omni::Dx12_Window().run();
 
+	Omni::trace_log("Omni Exiting Successfully...");
 	return 0;
 }

@@ -8,10 +8,14 @@ namespace Omni
     class OMNI_API Dx12_Window
     {
     public:
+        constexpr
+        Dx12_Window() noexcept;
+        ~Dx12_Window() noexcept;
+
     	static LRESULT CALLBACK 
 	    WindowProc(HWND h_wnd, UINT msg_type, WPARAM w_param, LPARAM l_param);
 
-        void 
+        int16_fast
         run();
 
     private:

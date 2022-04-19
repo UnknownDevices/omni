@@ -6,6 +6,12 @@
 
 namespace Omni
 {
+	constexpr
+	Dx12_Window::Dx12_Window() noexcept : m_class_name("Omni Engine Class"), 
+		m_title("Omni Engine"), m_width(720), m_height(480) {}
+
+	Dx12_Window::~Dx12_Window() noexcept = default;
+
 	LRESULT CALLBACK 
 	Dx12_Window::WindowProc(HWND h_wnd, UINT msg_type, WPARAM w_param, LPARAM l_param)
 	{
@@ -18,18 +24,9 @@ namespace Omni
 		return DefWindowProc(h_wnd, msg_type, w_param, l_param);
 	}
 
-	void
+	int16_fast
 	Dx12_Window::run()
 	{
-		using namespace Omni;
-
-		/* - Initialize Variables - */
-
-		m_class_name        = "Omni Engine Class";
-		m_title             = "Omni Engine";
-		m_width             = 780;
-		m_height            = 420;
-
 		/* - Create Window Class - */
 
 		WNDCLASSEX wcex;
@@ -53,8 +50,8 @@ namespace Omni
 		HWND h_wnd = CreateWindow(m_class_name, m_title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0,
 			m_width, m_height, nullptr, nullptr, s_omni_h_inst, nullptr);
 		if (!h_wnd) {
-			error_log("Failed to Create Window");
-			return;
+			error_log("Failed to Create Window!");
+			return -1;
 		}
 
 		ShowWindow(h_wnd, SW_SHOW);
@@ -70,5 +67,7 @@ namespace Omni
 				DispatchMessage(&msg);
 			}
 		}
+
+		return 0;
 	}
 }
