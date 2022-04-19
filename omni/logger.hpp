@@ -1,6 +1,6 @@
 #pragma once
 
-#include <omni/core.h>
+#include <omni/core.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/fmt/ostr.h>
@@ -40,7 +40,7 @@ namespace Omni
                 break;
             case Logger::Level::trace:
                 Logger::s_spdlog_logger->trace(fmt, std::forward<Args>(args)...);
-                break;    
+                break;
             case Logger::Level::info:
                 Logger::s_spdlog_logger->info(fmt, std::forward<Args>(args)...);
                 break;

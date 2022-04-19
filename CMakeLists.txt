@@ -25,11 +25,9 @@ endif()
 # File inclusions
 #----------------------------------------------------------------------------------
 list(APPEND H_OMNI_FILES
-    #*.h
-    omni/core.h
     #*.hpp
     omni/entry_point.hpp
-    omni/omni.hpp
+    omni/core.hpp
     omni/logger.hpp
     omni/dx12_window.hpp
     omni/utility/function.hpp
@@ -41,7 +39,7 @@ list(APPEND H_OMNI_FILES
 list(APPEND C_OMNI_FILES
     #*.cpp
     omni/dx12_window.cpp
-    omni/omni.cpp
+    omni/core.cpp
     omni/logger.cpp
 )
 
@@ -78,6 +76,7 @@ endif()
 
 target_precompile_headers(${PROJECT_NAME} 
     PUBLIC
+    <Windows.h>
     <coroutine>
     <vector>
     <array>

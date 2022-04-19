@@ -1,8 +1,8 @@
 #include <omni/dx12_window.hpp>
 
 #include <omni/resource.h>
-#include <omni/omni.hpp>
 #include <omni/logger.hpp>
+#include <omni/core.hpp>
 
 namespace Omni
 {

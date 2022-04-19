@@ -1,4 +1,4 @@
-#include <omni/omni.hpp>
+#include <omni/core.hpp>
 
 #include <omni/logger.hpp>
 
@@ -13,18 +13,18 @@ namespace Omni
 		s_exe_h_inst  = GetModuleHandle(NULL);
 		s_omni_h_inst = get_this_module_handle();
 
-        trace_log("Omni Initialized Successfully...");
+        trace_log("Initialized Successfully...");
         return 0;
     }
 
     HMODULE 
     get_this_module_handle()
     {
-        HMODULE hModule;
+        HMODULE h_module;
         ::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | 
             GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, 
-            (LPCTSTR)get_this_module_handle, &hModule);
+            (LPCTSTR)get_this_module_handle, &h_module);
 
-        return hModule;
+        return h_module;
     }
 }

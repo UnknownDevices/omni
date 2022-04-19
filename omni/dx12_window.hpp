@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Windows.h>
-#include <omni/core.h>
+#include <omni/core.hpp>
 
 namespace Omni
 {
