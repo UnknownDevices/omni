@@ -6,14 +6,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin/debug)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/release)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/release)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/release)
+set(SPDLOG_USE_STD_FORMAT ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 project(omni VERSION 1.0 DESCRIPTION "Omni Engine")
+set(OMNI_VERSION ${omni_VERSION})
 
 option(OMNI_GEN_EXAMPLE_SANDBOX "Add subdirectory examples/sandbox" ON)
-
-set(OMNI_VERSION ${omni_VERSION})
 
 if(WIN32)
     set(OMNI_GEN_FOR_WINDOWS_PLATFORM TRUE)
@@ -28,6 +28,8 @@ list(APPEND H_OMNI_FILES
     #*.hpp
     omni/entry_point.hpp
     omni/core.hpp
+    omni/window.hpp
+    omni/window_interface.hpp
     omni/logger.hpp
     omni/dx12_window.hpp
     omni/utility/function.hpp
@@ -76,7 +78,6 @@ endif()
 
 target_precompile_headers(${PROJECT_NAME} 
     PUBLIC
-    <Windows.h>
     <coroutine>
     <vector>
     <array>

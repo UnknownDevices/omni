@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+
 #ifdef OMNI_BUILD_DLL
     #define OMNI_API __declspec(dllexport)
 #else
@@ -41,7 +43,7 @@ namespace Omni
     inline constexpr auto
     bit_flag(size_t x) { return 1 << x; }
 
-    int16_fast OMNI_API
+    void OMNI_API
     init();
     
     HMODULE OMNI_API

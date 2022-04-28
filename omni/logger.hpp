@@ -1,9 +1,9 @@
 #pragma once
 
-#include <omni/core.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/fmt/ostr.h>
+#include <omni/core.hpp>
 
 namespace Omni
 {
@@ -31,8 +31,7 @@ namespace Omni
     };
 
     template<typename ... Args> void
-    log(Logger::Level level, std::string_view fmt, Args&& ... args)
-    {
+    log(Logger::Level level, std::string_view fmt, Args&& ... args) {
         switch(level)
         {
             case Logger::Level::debug:
@@ -57,38 +56,32 @@ namespace Omni
     }
 
 	template<typename ... Args> inline void
-    debug_log(std::string_view fmt, Args&& ... args)
-	{
+    debug_log(std::string_view fmt, Args&& ... args) {
 		log(Logger::Level::debug, std::move(fmt), std::forward<Args>(args)...);
 	}
 
 	template<typename ... Args> inline void
-    trace_log(std::string_view fmt, Args&& ... args)
-	{
+    trace_log(std::string_view fmt, Args&& ... args) {
 		log(Logger::Level::trace, std::move(fmt), std::forward<Args>(args)...);
 	}
 
 	template<typename ... Args> inline void
-    info_log(std::string_view fmt, Args&& ... args)
-	{
+    info_log(std::string_view fmt, Args&& ... args) {
 		log(Logger::Level::info, std::move(fmt), std::forward<Args>(args)...);
 	}
 
 	template<typename ... Args> inline void
-    warn_log(std::string_view fmt, Args&& ... args)
-	{
+    warn_log(std::string_view fmt, Args&& ... args) {
 		log(Logger::Level::warn, std::move(fmt), std::forward<Args>(args)...);
 	}
 
 	template<typename ... Args> inline void
-    error_log(std::string_view fmt, Args&& ... args)
-	{
+    error_log(std::string_view fmt, Args&& ... args) {
 		log(Logger::Level::error, std::move(fmt), std::forward<Args>(args)...);
 	}
 
 	template<typename ... Args> inline void
-    critical_log(std::string_view fmt, Args&& ... args)
-	{
+    critical_log(std::string_view fmt, Args&& ... args) {
 		log(Logger::Level::critical, std::move(fmt), std::forward<Args>(args)...);
 	}
 }
