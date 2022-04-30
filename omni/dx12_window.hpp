@@ -13,8 +13,11 @@ namespace Omni
         Dx12Window() noexcept;
         ~Dx12Window() noexcept;
 
+        static Dx12Window&
+	    get_app_state(HWND hwnd);
+
     	static LRESULT CALLBACK 
-	    WindowProc(HWND h_wnd, UINT msg_type, WPARAM w_param, LPARAM l_param);
+	    window_proc(HWND hwnd, UINT msg_type, WPARAM w_param, LPARAM l_param);
 
         void
         run();
@@ -22,6 +25,9 @@ namespace Omni
     private:
         LPCSTR m_class_name;
 	    LPCSTR m_title;
+
+        HWND   m_hwnd;
+
 	    INT	   m_width;
 	    INT    m_height;
     };

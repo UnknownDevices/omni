@@ -13,55 +13,73 @@ namespace Omni
 
 	Dx12Window::~Dx12Window() noexcept = default;
 
+	Dx12Window& 
+	Dx12Window::get_app_state(HWND hwnd)
+	{
+		LONG_PTR ptr = GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		Dx12Window* p_state = reinterpret_cast<Dx12Window*>(ptr);
+		return *p_state;
+	}
+ 
 	LRESULT CALLBACK 
-	Dx12Window::WindowProc(HWND h_wnd, UINT msg_type, WPARAM w_param, LPARAM l_param) {
+	Dx12Window::window_proc(HWND hwnd, UINT msg_type, WPARAM w_param, LPARAM l_param) {
 		switch (msg_type) {
-			case WM_DESTROY:
+			case WM_DESTROY: {
 				PostQuitMessage(0);
-				break;
-		}
+				return 0;
+			}
+			case WM_CREATE: {
+				CREATESTRUCT* p_create = reinterpret_cast<CREATESTRUCT*>(l_param);
+				SetWindowLongPtr(hwnd, GWLP_USERDATA, 
+					reinterpret_cast<LONG_PTR>(p_create->lpCreateParams));
+			}
+			case WM_PAINT: {
+				PAINTSTRUCT ps;
+				HDC hdc = BeginPaint(hwnd, &ps);
 
-		return DefWindowProc(h_wnd, msg_type, w_param, l_param);
+				EndPaint(hwnd, &ps);
+				return 0;
+			}
+			default: {
+				return DefWindowProc(hwnd, msg_type, w_param, l_param);
+			}
+		}
 	}
 
 	void
 	Dx12Window::run() {
-		/* - Create Window Class - */
-
 		WNDCLASSEX wcex;
 		wcex.cbSize 		      = sizeof(WNDCLASSEX);
 		wcex.style 			      = CS_HREDRAW | CS_VREDRAW;
 		wcex.cbClsExtra 		  = 0;
 		wcex.cbWndExtra 		  = 0;
 		wcex.hCursor 			  = LoadCursor(nullptr, IDC_ARROW);
-		wcex.hbrBackground        = (HBRUSH)GetStockObject(NULL_BRUSH);
-		wcex.hIcon = wcex.hIconSm = (HICON)LoadImage(s_omni_h_inst, MAKEINTRESOURCE(ICON_MAIN),
-			IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+		wcex.hbrBackground        = static_cast<HBRUSH>(CreateSolidBrush(RGB(40, 44, 52)));
+		wcex.hIcon = wcex.hIconSm = static_cast<HICON>(LoadImage(s_omni_h_inst, 
+			MAKEINTRESOURCE(ICON_MAIN), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR));
 		wcex.lpszClassName 		  = m_class_name;
 		wcex.lpszMenuName 		  = nullptr;
 		wcex.hInstance 			  = s_omni_h_inst;
-		wcex.lpfnWndProc 		  = WindowProc;
+		wcex.lpfnWndProc 		  = window_proc;
 
 		RegisterClassEx(&wcex);
 
-		/* - Create and Display our Window  - */
+		m_hwnd = CreateWindowEx(0, m_class_name, m_title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+			CW_USEDEFAULT, 720, 480, nullptr, nullptr, s_omni_h_inst, this);
 
-		HWND h_wnd = CreateWindow(m_class_name, m_title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0,
-			m_width, m_height, nullptr, nullptr, s_omni_h_inst, nullptr);
-		if (!h_wnd) {
+		if (!m_hwnd) {
 			error_log("Failed to Create Window!");
 			return;
 		}
 
-		ShowWindow(h_wnd, SW_SHOW);
+		ShowWindow(m_hwnd, SW_SHOW);
 
-		/* - Listen for Message Events - */
-
-		MSG msg = {0};
-		while (msg.message != WM_QUIT)
-		{
-			if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-			{
+		MSG msg = {};
+		while (true) {
+			if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+				if(msg.message == WM_QUIT)
+					break;
+				
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
