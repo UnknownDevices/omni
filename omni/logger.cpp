@@ -9,6 +9,6 @@ namespace Omni
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 		s_spdlog_logger = spdlog::stdout_color_mt("OMNI");
 		s_spdlog_logger->set_level(spdlog::level::trace);
-		trace_log("Logger Initialized succesfully...");
+		trace_log("Logger initialized successfully.");
 	}
 }

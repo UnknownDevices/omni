@@ -11,7 +11,7 @@ namespace Omni
 		s_exe_h_inst  = GetModuleHandle(NULL);
 		s_omni_h_inst = get_this_module_handle();
 
-        trace_log("Initialized Successfully...");
+        trace_log("Initialized successfully.");
     }
 
     HMODULE 

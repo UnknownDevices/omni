@@ -74,7 +74,7 @@ namespace Omni
 
 		ShowWindow(m_hwnd, SW_SHOW);
 
-		MSG msg = {};
+		MSG msg;
 		while (true) {
 			if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 				if(msg.message == WM_QUIT)

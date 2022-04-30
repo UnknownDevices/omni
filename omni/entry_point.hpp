@@ -15,6 +15,6 @@ wmain(int argc, wchar_t** argv) {
 	s_window_implementer = {};
 	get_window().run();
 
-	Omni::trace_log("Exiting Successfully...");
+	Omni::trace_log("Exited succesfully.");
 	return 0;
 }
