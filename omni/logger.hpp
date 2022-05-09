@@ -119,16 +119,4 @@ namespace Omni
         __debugbreak();
         #endif
     }
-
-    // template<typename ... Args> constexpr void
-    // soft_assert(bool to_assert, std::string_view fmt, Args&& ... args)
-    // {
-    //     soft_static_assert(to_assert)
-    // }
-
-    // template<typename ... Args> void
-    // soft_assert(bool to_assert, std::string_view fmt, Args&& ... args)
-    // {
-    //     soft_runtime_assert(to_assert)
-    // }
 }
