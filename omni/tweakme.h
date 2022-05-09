@@ -1,0 +1,17 @@
+#pragma once
+
+#ifndef OMNI_DISABLE_LOGGER
+#define OMNI_DISABLE_LOGGER false
+#endif
+
+#ifndef OMNI_DISABLE_FORCEINLINE
+#define OMNI_DISABLE_FORCEINLINE false
+#endif
+
+#ifndef OMNI_BREAK_ON_FAILED_SOFT_ASSERTS
+#define OMNI_BREAK_ON_FAILED_SOFT_ASSERTS false
+#endif
+
+#ifndef OMNI_BREAK_ON_FAILED_HARD_ASSERTS
+#define OMNI_BREAK_ON_FAILED_HARD_ASSERTS true
+#endif

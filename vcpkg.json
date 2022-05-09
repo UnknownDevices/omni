@@ -4,5 +4,6 @@
   "description": "Omni Engine",
   "license": "MIT",
   "dependencies": [
+    "magic-enum"
   ]
 }

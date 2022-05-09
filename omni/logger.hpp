@@ -12,76 +12,123 @@ namespace Omni
     public:
         enum class Level
         {
-            debug    = 0,
-            trace    = 1,
-            info     = 2,
-            warn     = 3,
-            error    = 4,
-            critical = 5
+            Debug    = 0,
+            Trace    = 1,
+            Info     = 2,
+            Warn     = 3,
+            Error    = 4,
+            Critical = 5
         };
 
         template<typename ... Args> friend void
-        log(Logger::Level level, std::string_view fmt, Args&& ... args);
- 
-        static void 
-        init();
+            log(Logger::Level level, std::string_view fmt, Args&& ... args);
+
+        static void
+            init();
 
     private:
-        static std::shared_ptr<spdlog::logger> s_spdlog_logger;
+        static inline std::shared_ptr<spdlog::logger> s_spdlog_logger;
     };
 
     template<typename ... Args> void
-    log(Logger::Level level, std::string_view fmt, Args&& ... args) {
-        switch(level)
+        log(Logger::Level level, std::string_view fmt, Args&& ... args)
+    {
+        switch (level)
         {
-            case Logger::Level::debug:
+            case Logger::Level::Debug:
                 Logger::s_spdlog_logger->debug(fmt, std::forward<Args>(args)...);
                 break;
-            case Logger::Level::trace:
+            case Logger::Level::Trace:
                 Logger::s_spdlog_logger->trace(fmt, std::forward<Args>(args)...);
                 break;
-            case Logger::Level::info:
+            case Logger::Level::Info:
                 Logger::s_spdlog_logger->info(fmt, std::forward<Args>(args)...);
                 break;
-            case Logger::Level::warn:
+            case Logger::Level::Warn:
                 Logger::s_spdlog_logger->warn(fmt, std::forward<Args>(args)...);
                 break;
-            case Logger::Level::error:
+            case Logger::Level::Error:
                 Logger::s_spdlog_logger->error(fmt, std::forward<Args>(args)...);
                 break;
-			case Logger::Level::critical:
+            case Logger::Level::Critical:
                 Logger::s_spdlog_logger->critical(fmt, std::forward<Args>(args)...);
                 break;
         }
     }
 
-	template<typename ... Args> inline void
-    debug_log(std::string_view fmt, Args&& ... args) {
-		log(Logger::Level::debug, std::move(fmt), std::forward<Args>(args)...);
-	}
+    template<typename ... Args> OMNI_INLINE void
+        debug_log(std::string_view fmt, const Args& ... args)
+    {
+        log(Logger::Level::Debug, std::move(fmt), args...);
+    }
 
-	template<typename ... Args> inline void
-    trace_log(std::string_view fmt, Args&& ... args) {
-		log(Logger::Level::trace, std::move(fmt), std::forward<Args>(args)...);
-	}
+    template<typename ... Args> OMNI_INLINE void
+        trace_log(std::string_view fmt, Args&& ... args)
+    {
+        log(Logger::Level::Trace, std::move(fmt), std::forward<Args>(args)...);
+    }
 
-	template<typename ... Args> inline void
-    info_log(std::string_view fmt, Args&& ... args) {
-		log(Logger::Level::info, std::move(fmt), std::forward<Args>(args)...);
-	}
+    template<typename ... Args> OMNI_INLINE void
+        info_log(std::string_view fmt, Args&& ... args)
+    {
+        log(Logger::Level::Info, std::move(fmt), std::forward<Args>(args)...);
+    }
 
-	template<typename ... Args> inline void
-    warn_log(std::string_view fmt, Args&& ... args) {
-		log(Logger::Level::warn, std::move(fmt), std::forward<Args>(args)...);
-	}
+    template<typename ... Args> OMNI_INLINE void
+        warn_log(std::string_view fmt, Args&& ... args)
+    {
+        log(Logger::Level::Warn, std::move(fmt), std::forward<Args>(args)...);
+    }
 
-	template<typename ... Args> inline void
-    error_log(std::string_view fmt, Args&& ... args) {
-		log(Logger::Level::error, std::move(fmt), std::forward<Args>(args)...);
-	}
+    template<typename ... Args> OMNI_INLINE void
+        error_log(std::string_view fmt, Args&& ... args)
+    {
+        log(Logger::Level::Error, std::move(fmt), std::forward<Args>(args)...);
+    }
 
-	template<typename ... Args> inline void
-    critical_log(std::string_view fmt, Args&& ... args) {
-		log(Logger::Level::critical, std::move(fmt), std::forward<Args>(args)...);
-	}
+    template<typename ... Args> OMNI_INLINE void
+        critical_log(std::string_view fmt, Args&& ... args)
+    {
+        log(Logger::Level::Critical, std::move(fmt), std::forward<Args>(args)...);
+    }
+
+    template<typename ... Args> OMNI_INLINE void
+        soft_assert(bool to_assert, std::string_view fmt, Args&& ... args)
+    {
+        if (to_assert)
+            return;
+
+        log(Logger::Level::Warn, std::string("Soft assertion failed with message: ").append(fmt),
+            std::forward<Args>(args)...);
+
+        #if OMNI_BREAK_ON_FAILED_SOFT_ASSERTS
+        __debugbreak();
+        #endif
+    }
+
+    template<typename ... Args> OMNI_INLINE void
+        hard_assert(bool to_assert, std::string_view fmt, Args&& ... args)
+    {
+        if (to_assert)
+            return;
+
+        log(Logger::Level::Error, std::string("Hard assertion failed with message: ").append(fmt),
+            std::forward<Args>(args)...);
+
+        #if OMNI_BREAK_ON_FAILED_HARD_ASSERTS
+        __debugbreak();
+        #endif
+    }
+
+    // template<typename ... Args> constexpr void
+    // soft_assert(bool to_assert, std::string_view fmt, Args&& ... args)
+    // {
+    //     soft_static_assert(to_assert)
+    // }
+
+    // template<typename ... Args> void
+    // soft_assert(bool to_assert, std::string_view fmt, Args&& ... args)
+    // {
+    //     soft_runtime_assert(to_assert)
+    // }
 }

@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <omni/core.hpp>
 #include <omni/window_interface.hpp>
+#include <omni/math.hpp>
 
 namespace Omni
 {
@@ -10,25 +11,37 @@ namespace Omni
     {
     public:
         constexpr
-        Dx12Window() noexcept;
+            Dx12Window() noexcept = default;
+
+        constexpr
+            Dx12Window(Vector2D<int> pos, Vector2D<int> size) noexcept :
+            m_class_name("Omni Engine Class"), m_title("Omni Engine"), m_pos(pos), m_size(size)
+        {}
+
         ~Dx12Window() noexcept;
 
-        static Dx12Window&
-	    get_app_state(HWND hwnd);
+        static Vector2D<int>
+            get_pos_at_monitor_center(Vector2D<int> size)
+        {
+            RECT dsk_rect;
+            const HWND dsk = GetDesktopWindow();
 
-    	static LRESULT CALLBACK 
-	    window_proc(HWND hwnd, UINT msg_type, WPARAM w_param, LPARAM l_param);
+            GetWindowRect(dsk, &dsk_rect);
+            return {(dsk_rect.right / 2) - (size.x / 2), (dsk_rect.bottom / 2) - (size.y / 2)};
+        }
+
+        static Dx12Window&
+            get_app_state(HWND hwnd);
+
+        static LRESULT CALLBACK
+            windows_proc(HWND hwnd, UINT msg_type, WPARAM w_param, LPARAM l_param);
 
         void
-        run();
+            create_sys_window();
 
     private:
-        LPCSTR m_class_name;
-	    LPCSTR m_title;
-
+        LPCSTR m_class_name, m_title;
         HWND   m_hwnd;
-
-	    INT	   m_width;
-	    INT    m_height;
+        Vector2D<int> m_size, m_pos;
     };
 }

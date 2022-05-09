@@ -8,8 +8,7 @@ namespace Omni
 	public:
 		constexpr Function(Ret(*context_fn_ptr)(void*, Args...), void* context) noexcept
 			: m_context_fn_ptr(context_fn_ptr), m_context(context)
-		{
-		}
+		{}
 
 		~Function() noexcept = default;
 
@@ -24,7 +23,7 @@ namespace Omni
 			return Function<Ret, Args...>(&pv_invoke_context<Ret(*)(Args...)>, fn_ptr);
 		}
 
-		template<typename Functor>  
+		template<typename Functor>
 		constexpr static auto make(Functor& functor) -> Function<Ret, Args...>
 		{
 			return Function<Ret, Args...>(&pv_invoke_context<Functor>, &functor);
@@ -47,7 +46,7 @@ namespace Omni
 		{
 			return (*(Invokable*)context)(args...);
 		}
-		
+
 		template<>
 		static auto pv_invoke_context<Ret(*)(Args...)>(void* context, Args ... args) -> Ret
 		{

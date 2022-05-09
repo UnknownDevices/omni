@@ -13,21 +13,28 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project(omni VERSION 1.0 DESCRIPTION "Omni Engine")
 set(OMNI_VERSION ${omni_VERSION})
 
-option(OMNI_GEN_EXAMPLE_SANDBOX "Add subdirectory examples/sandbox" ON)
+option(OMNI_BUILD_AS_SHARED "Build Omni as a dynamic library" OFF)
 
-if(WIN32)
-    set(OMNI_GEN_FOR_WINDOWS_PLATFORM TRUE)
+if(${OMNI_BUILD_AS_SHARED})
+    set(OMNI_STATIC OFF)
+    set(OMNI_SHARED ON)
 else()
-    message(FATAL_ERROR "Omni only supports Windows for the time being!")
+    set(OMNI_STATIC ON)
+    set(OMNI_SHARED OFF)
 endif()
+
+find_package(magic_enum CONFIG REQUIRED)
 
 #----------------------------------------------------------------------------------
 # File inclusions
 #----------------------------------------------------------------------------------
-list(APPEND H_OMNI_FILES
+list(APPEND OMNI_H_FILES
     #*.hpp
     omni/entry_point.hpp
     omni/core.hpp
+    omni/tweakme.h
+    omni/math.hpp
+    omni/utility/proc_state.hpp
     omni/window.hpp
     omni/window_interface.hpp
     omni/logger.hpp
@@ -38,45 +45,47 @@ list(APPEND H_OMNI_FILES
     omni/random/shuffle_bag.hpp
 )
 
-list(APPEND C_OMNI_FILES
+list(APPEND OMNI_C_FILES
     #*.cpp
     omni/dx12_window.cpp
     omni/core.cpp
     omni/logger.cpp
 )
 
-if(OMNI_GEN_FOR_WINDOWS_PLATFORM)
-    list(APPEND H_OMNI_FILES
-    )
+list(APPEND STATIC_LIB_RES_FILES
+    #*.rc
+    $<$<BOOL:${OMNI_STATIC}>:${PROJECT_SOURCE_DIR}/omni/resources.rc>
+)
+#----------------------------------------------------------------------------------
 
-    list(APPEND C_OMNI_FILES
+if(${OMNI_STATIC})
+    add_library(omni 
+    STATIC
+    ${OMNI_H_FILES}
+    ${OMNI_C_FILES}
+    )
+else()
+    add_library(omni 
+    SHARED
+    ${OMNI_H_FILES}
+    ${OMNI_C_FILES}
+    omni/resources.rc
     )
 endif()
 
-#----------------------------------------------------------------------------------
-
-set(CXX_STANDARD 20)
-set(CXX_STANDARD_REQUIRED ON)
-
-add_library(${PROJECT_NAME} 
-    SHARED
-    ${H_OMNI_FILES}
-    ${C_OMNI_FILES}
-    omni/resources.rc
-)
-
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON) 
+set_property(TARGET omni PROPERTY CXX_STANDARD 23)
+set_property(TARGET omni PROPERTY CXX_STANDARD_REQUIRED ON) 
 
 add_subdirectory(vendor/spdlog)
+
 set_property(TARGET spdlog PROPERTY CXX_STANDARD 23)
 set_property(TARGET spdlog PROPERTY CXX_STANDARD_REQUIRED ON) 
 
-if(OMNI_GEN_EXAMPLE_SANDBOX)
-    add_subdirectory(examples/sandbox)
-endif()
+add_subdirectory(examples/sandbox)
 
-target_precompile_headers(${PROJECT_NAME} 
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT sandbox)
+
+target_precompile_headers(omni
     PUBLIC
     <coroutine>
     <vector>
@@ -98,6 +107,7 @@ target_precompile_headers(${PROJECT_NAME}
     <algorithm>
     <thread>
     <string>
+    <cstring>
     <type_traits>
     <cstddef>
     <stdint.h>
@@ -109,27 +119,54 @@ target_precompile_headers(${PROJECT_NAME}
 source_group(TREE ${PROJECT_SOURCE_DIR}/omni 
     PREFIX omni/
     FILES 
-    ${H_OMNI_FILES}
-    ${C_OMNI_FILES}
+    ${OMNI_H_FILES}
+    ${OMNI_C_FILES}
 )
 
-target_compile_definitions(${PROJECT_NAME}
+target_compile_definitions(omni
     PUBLIC
     $<$<CONFIG:Debug>:OMNI_DEBUG>
     $<$<CONFIG:Release>:OMNI_RELEASE>     
+    $<$<CONFIG:RelWithDebInfo>:OMNI_REL_WITH_DEB_INFO>   
+    $<$<CONFIG:MinSizeRel>:OMNI_MIN_SIZE_REL>
+    $<IF:$<BOOL:${OMNI_STATIC}>,OMNI_STATIC,OMNI_SHARED>
     PRIVATE
-    OMNI_BUILD_DLL
+    $<$<BOOL:${OMNI_SHARED}>:OMNI_EXPORT_DLL>
 )
 
-target_include_directories(${PROJECT_NAME} 
+target_include_directories(omni 
     PUBLIC
     ${CMAKE_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_compile_options(omni
+    PRIVATE
+    /MP
+    /Z7
+    /Ot
+    /W4
+    $<$<NOT:$<CONFIG:Debug>>:/GF>
+)
+
+target_link_libraries(omni
     PUBLIC  
     spdlog::spdlog
+    magic_enum::magic_enum
+    D3d12.dll
+    D3d11.dll
 )
+
+if(${OMNI_SHARED})
+    target_link_options(omni
+        PRIVATE
+        /OPT:REF
+        /INCREMENTAL:NO
+        $<$<CONFIG:Debug>:/OPT:NOICF /DEBUG:FASTLINK>
+        $<$<CONFIG:RelWithDebInfo>:/OPT:ICF /DEBUG:FASTLINK>
+        $<$<CONFIG:Release>:/OPT:ICF>
+        $<$<CONFIG:MinSizeRel>:/OPT:ICF>
+    )    
+endif()
 
 configure_file(omni_config.h.in omni_config.h)
