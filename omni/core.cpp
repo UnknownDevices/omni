@@ -8,7 +8,7 @@ namespace Omni
         init()
     {
         Logger::init();
-        
+
     #if OMNI_STATIC
         s_exe_h_inst  = GetModuleHandle(NULL); // TODO: Look into GetModuleHandleEx
     #else

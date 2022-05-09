@@ -12,12 +12,13 @@ get_window() noexcept
 }
 
 int
-wmain(int argc, wchar_t** argv)
+wmain(/**int argc, wchar_t** argv**/)
 {
 	using namespace Omni;
 	init();
 
-	s_window_implementer = {Window::get_pos_at_monitor_center({480, 720}), {480, 720}};
+	auto pos = Window::get_pos_at_monitor_center({480, 720});
+	s_window_implementer = {pos, {480, 720}};
 	get_window().create_sys_window();
 
 	trace_log("Exited succesfully.");

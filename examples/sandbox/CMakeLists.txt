@@ -36,7 +36,7 @@ target_compile_options(sandbox
     /Z7
     /Ot
     /W4
-    $<$<NOT:$<CONFIG:Debug>>:/GF>
+    $<$<NOT:$<CONFIG:Debug>>:/GF /GL>
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -49,7 +49,7 @@ target_link_options(sandbox
     /OPT:REF
     /INCREMENTAL:NO
     $<$<CONFIG:Debug>:/OPT:NOICF /DEBUG:FASTLINK>
-    $<$<CONFIG:RelWithDebInfo>:/OPT:ICF /DEBUG:FASTLINK>
-    $<$<CONFIG:Release>:/OPT:ICF>
-    $<$<CONFIG:MinSizeRel>:/OPT:ICF>
+    $<$<CONFIG:RelWithDebInfo>:/OPT:ICF /LTCG /DEBUG:FASTLINK>
+    $<$<CONFIG:Release>:/OPT:ICF /LTCG>
+    $<$<CONFIG:MinSizeRel>:/OPT:ICF /LTCG>
 )    

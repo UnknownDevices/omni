@@ -18,17 +18,11 @@ namespace Omni
             m_class_name("Omni Engine Class"), m_title("Omni Engine"), m_pos(pos), m_size(size)
         {}
 
-        ~Dx12Window() noexcept;
+        constexpr
+            ~Dx12Window() noexcept = default;
 
         static Vector2D<int>
-            get_pos_at_monitor_center(Vector2D<int> size)
-        {
-            RECT dsk_rect;
-            const HWND dsk = GetDesktopWindow();
-
-            GetWindowRect(dsk, &dsk_rect);
-            return {(dsk_rect.right / 2) - (size.x / 2), (dsk_rect.bottom / 2) - (size.y / 2)};
-        }
+            get_pos_at_monitor_center(Vector2D<int> size);
 
         static Dx12Window&
             get_app_state(HWND hwnd);

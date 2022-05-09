@@ -5,7 +5,15 @@
 
 namespace Omni
 {
-    Dx12Window::~Dx12Window() noexcept = default;
+    Vector2D<int>
+        Dx12Window::get_pos_at_monitor_center(Vector2D<int> size)
+    {
+        RECT dsk_rect;
+        const HWND dsk = GetDesktopWindow();
+
+        GetWindowRect(dsk, &dsk_rect);
+        return {(dsk_rect.right / 2) - (size.x / 2), (dsk_rect.bottom / 2) - (size.y / 2)};
+    }
 
     Dx12Window&
         Dx12Window::get_app_state(HWND hwnd)
@@ -23,7 +31,7 @@ namespace Omni
             case WM_DESTROY:
             {
                 PostQuitMessage(0);
-                return 0;
+                break;
             }
             case WM_CREATE:
             {
@@ -40,11 +48,9 @@ namespace Omni
                 EndPaint(hwnd, &ps);
                 return 0;
             }
-            default:
-            {
-                return DefWindowProc(hwnd, msg_type, w_param, l_param);
-            }
         }
+        
+        return DefWindowProc(hwnd, msg_type, w_param, l_param);
     }
 
     void
@@ -66,8 +72,8 @@ namespace Omni
 
         RegisterClassEx(&wcex);
 
-        m_hwnd = CreateWindowEx(0, m_class_name, m_title, WS_OVERLAPPEDWINDOW, m_pos.x,
-            m_pos.y, m_size.x, m_size.y, nullptr, nullptr, s_omni_h_inst, this);
+        m_hwnd = CreateWindowEx(0, m_class_name, m_title, WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+            m_pos.x, m_pos.y, m_size.x, m_size.y, nullptr, nullptr, s_omni_h_inst, this);
         hard_assert(m_hwnd, "CreateWindowEx failed with code: {}!", GetLastError());
 
         bool succeded = AnimateWindow(m_hwnd, 200, AW_SLIDE | AW_VER_POSITIVE);

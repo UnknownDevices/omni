@@ -6,6 +6,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin/debug)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/release)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/release)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/release)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/bin/min_size_rel)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/bin/min_size_rel)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/bin/min_size_rel)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin/rel_with_deb_info)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin/rel_with_deb_info)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin/rel_with_deb_info) 
 set(SPDLOG_USE_STD_FORMAT ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -13,7 +19,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project(omni VERSION 1.0 DESCRIPTION "Omni Engine")
 set(OMNI_VERSION ${omni_VERSION})
 
-option(OMNI_BUILD_AS_SHARED "Build Omni as a dynamic library" OFF)
+option(OMNI_BUILD_AS_SHARED "Build Omni as a dynamic library" ON)
 
 if(${OMNI_BUILD_AS_SHARED})
     set(OMNI_STATIC OFF)
@@ -146,7 +152,7 @@ target_compile_options(omni
     /Z7
     /Ot
     /W4
-    $<$<NOT:$<CONFIG:Debug>>:/GF>
+    $<$<NOT:$<CONFIG:Debug>>:/GF /GL>
 )
 
 target_link_libraries(omni
@@ -163,9 +169,9 @@ if(${OMNI_SHARED})
         /OPT:REF
         /INCREMENTAL:NO
         $<$<CONFIG:Debug>:/OPT:NOICF /DEBUG:FASTLINK>
-        $<$<CONFIG:RelWithDebInfo>:/OPT:ICF /DEBUG:FASTLINK>
-        $<$<CONFIG:Release>:/OPT:ICF>
-        $<$<CONFIG:MinSizeRel>:/OPT:ICF>
+        $<$<CONFIG:RelWithDebInfo>:/OPT:ICF /LTCG /DEBUG:FASTLINK>
+        $<$<CONFIG:Release>:/OPT:ICF /LTCG>
+        $<$<CONFIG:MinSizeRel>:/OPT:ICF /LTCG>
     )    
 endif()
 

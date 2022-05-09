@@ -10,7 +10,7 @@ namespace Omni
     class OMNI_API Logger
     {
     public:
-        enum class Level
+        enum class Level // TODO: Likely needs rethinking
         {
             Debug    = 0,
             Trace    = 1,
@@ -20,103 +20,88 @@ namespace Omni
             Critical = 5
         };
 
-        template<typename ... Args> friend void
-            log(Logger::Level level, std::string_view fmt, Args&& ... args);
+        friend void OMNI_API
+            log(Logger::Level level, std::string_view fmt); // TODO: Use FMT library instead
 
         static void
             init();
 
     private:
+    #pragma warning( push )
+    #pragma warning( disable : 4251 )
         static inline std::shared_ptr<spdlog::logger> s_spdlog_logger;
+    #pragma warning( pop )
     };
 
     template<typename ... Args> void
-        log(Logger::Level level, std::string_view fmt, Args&& ... args)
+        log(Logger::Level level, std::string_view fmt, const Args& ... args)
     {
-        switch (level)
-        {
-            case Logger::Level::Debug:
-                Logger::s_spdlog_logger->debug(fmt, std::forward<Args>(args)...);
-                break;
-            case Logger::Level::Trace:
-                Logger::s_spdlog_logger->trace(fmt, std::forward<Args>(args)...);
-                break;
-            case Logger::Level::Info:
-                Logger::s_spdlog_logger->info(fmt, std::forward<Args>(args)...);
-                break;
-            case Logger::Level::Warn:
-                Logger::s_spdlog_logger->warn(fmt, std::forward<Args>(args)...);
-                break;
-            case Logger::Level::Error:
-                Logger::s_spdlog_logger->error(fmt, std::forward<Args>(args)...);
-                break;
-            case Logger::Level::Critical:
-                Logger::s_spdlog_logger->critical(fmt, std::forward<Args>(args)...);
-                break;
-        }
+        log(level, std::format(fmt, args...));
     }
 
-    template<typename ... Args> OMNI_INLINE void
+    template<typename ... Args> void
         debug_log(std::string_view fmt, const Args& ... args)
     {
-        log(Logger::Level::Debug, std::move(fmt), args...);
+        log(Logger::Level::Debug, std::format(fmt, args...));
     }
 
-    template<typename ... Args> OMNI_INLINE void
+    template<typename ... Args> void
         trace_log(std::string_view fmt, Args&& ... args)
     {
-        log(Logger::Level::Trace, std::move(fmt), std::forward<Args>(args)...);
+        log(Logger::Level::Trace, std::format(fmt, args...));
     }
 
-    template<typename ... Args> OMNI_INLINE void
+    template<typename ... Args> void
         info_log(std::string_view fmt, Args&& ... args)
     {
-        log(Logger::Level::Info, std::move(fmt), std::forward<Args>(args)...);
+        log(Logger::Level::Info, std::format(fmt, args...));
     }
 
-    template<typename ... Args> OMNI_INLINE void
+    template<typename ... Args> void
         warn_log(std::string_view fmt, Args&& ... args)
     {
-        log(Logger::Level::Warn, std::move(fmt), std::forward<Args>(args)...);
+        log(Logger::Level::Warn, std::format(fmt, args...));
     }
 
-    template<typename ... Args> OMNI_INLINE void
+    template<typename ... Args> void
         error_log(std::string_view fmt, Args&& ... args)
     {
-        log(Logger::Level::Error, std::move(fmt), std::forward<Args>(args)...);
+        log(Logger::Level::Error, std::format(fmt, args...));
     }
 
-    template<typename ... Args> OMNI_INLINE void
+    template<typename ... Args> void
         critical_log(std::string_view fmt, Args&& ... args)
     {
-        log(Logger::Level::Critical, std::move(fmt), std::forward<Args>(args)...);
+        log(Logger::Level::Critical, std::format(fmt, args...));
     }
 
-    template<typename ... Args> OMNI_INLINE void
+    // TODO: Should it log line and file on failed assert?
+    template<typename ... Args> void
         soft_assert(bool to_assert, std::string_view fmt, Args&& ... args)
     {
         if (to_assert)
             return;
 
-        log(Logger::Level::Warn, std::string("Soft assertion failed with message: ").append(fmt),
-            std::forward<Args>(args)...);
+        log(Logger::Level::Warn, "Soft assertion failed with message: " + 
+            std::format(fmt, args...));
 
-        #if OMNI_BREAK_ON_FAILED_SOFT_ASSERTS
+    #if OMNI_BREAK_ON_FAILED_SOFT_ASSERTS
         __debugbreak();
-        #endif
+    #endif
     }
 
-    template<typename ... Args> OMNI_INLINE void
+    // TODO: Should it log line and file on failed assert?
+    template<typename ... Args> void
         hard_assert(bool to_assert, std::string_view fmt, Args&& ... args)
     {
         if (to_assert)
             return;
 
-        log(Logger::Level::Error, std::string("Hard assertion failed with message: ").append(fmt),
-            std::forward<Args>(args)...);
+        log(Logger::Level::Error, "Hard assertion failed with message: " + 
+            std::format(fmt, args...));
 
-        #if OMNI_BREAK_ON_FAILED_HARD_ASSERTS
+    #if OMNI_BREAK_ON_FAILED_HARD_ASSERTS
         __debugbreak();
-        #endif
+    #endif
     }
 }
