@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Windows.h>
-#include <omni/tweakme.h>
+#include <omni/win/windows.h>
+#include <omni/config.h>
 
 #if OMNI_STATIC
 #define OMNI_API
@@ -64,6 +64,7 @@ namespace Omni
     typedef uint_least32_t uint32_least;
     typedef uint_least64_t uint64_least;
 
+    // inline bool quit_requested;
 #if OMNI_STATIC
     inline HINSTANCE s_exe_h_inst;
     inline HINSTANCE& s_omni_h_inst = s_exe_h_inst;

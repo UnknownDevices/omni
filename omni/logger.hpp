@@ -1,5 +1,8 @@
 #pragma once
 
+#pragma warning( push )
+#pragma warning( disable : 4251 )
+
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/fmt/ostr.h>
@@ -21,63 +24,61 @@ namespace Omni
         };
 
         friend void OMNI_API
-            log(Logger::Level level, std::string_view fmt); // TODO: Use FMT library instead
+            log(Logger::Level level, std::string_view fmt);
 
         static void
             init();
 
     private:
-    #pragma warning( push )
-    #pragma warning( disable : 4251 )
         static inline std::shared_ptr<spdlog::logger> s_spdlog_logger;
-    #pragma warning( pop )
     };
 
-    template<typename ... Args> void
-        log(Logger::Level level, std::string_view fmt, const Args& ... args)
+    // TODO: Use FMT library instead
+    template<typename ... Args>
+    void log(Logger::Level level, std::string_view fmt, const Args& ... args)
     {
         log(level, std::format(fmt, args...));
     }
 
-    template<typename ... Args> void
-        debug_log(std::string_view fmt, const Args& ... args)
+    template<typename ... Args>
+    void debug_log(std::string_view fmt, const Args& ... args)
     {
         log(Logger::Level::Debug, std::format(fmt, args...));
     }
 
-    template<typename ... Args> void
-        trace_log(std::string_view fmt, Args&& ... args)
+    template<typename ... Args>
+    void trace_log(std::string_view fmt, Args&& ... args)
     {
         log(Logger::Level::Trace, std::format(fmt, args...));
     }
 
-    template<typename ... Args> void
-        info_log(std::string_view fmt, Args&& ... args)
+    template<typename ... Args>
+    void info_log(std::string_view fmt, Args&& ... args)
     {
         log(Logger::Level::Info, std::format(fmt, args...));
     }
 
-    template<typename ... Args> void
-        warn_log(std::string_view fmt, Args&& ... args)
+    template<typename ... Args>
+    void warn_log(std::string_view fmt, Args&& ... args)
     {
         log(Logger::Level::Warn, std::format(fmt, args...));
     }
 
-    template<typename ... Args> void
-        error_log(std::string_view fmt, Args&& ... args)
+    template<typename ... Args>
+    void error_log(std::string_view fmt, Args&& ... args)
     {
         log(Logger::Level::Error, std::format(fmt, args...));
     }
 
-    template<typename ... Args> void
-        critical_log(std::string_view fmt, Args&& ... args)
+    template<typename ... Args>
+    void critical_log(std::string_view fmt, Args&& ... args)
     {
         log(Logger::Level::Critical, std::format(fmt, args...));
     }
 
     // TODO: Should it log line and file on failed assert?
-    template<typename ... Args> void
-        soft_assert(bool to_assert, std::string_view fmt, Args&& ... args)
+    template<typename ... Args>
+    void soft_assert(bool to_assert, std::string_view fmt, Args&& ... args)
     {
         if (to_assert)
             return;
@@ -90,9 +91,8 @@ namespace Omni
     #endif
     }
 
-    // TODO: Should it log line and file on failed assert?
-    template<typename ... Args> void
-        hard_assert(bool to_assert, std::string_view fmt, Args&& ... args)
+    template<typename ... Args>
+    void hard_assert(bool to_assert, std::string_view fmt, Args&& ... args)
     {
         if (to_assert)
             return;
@@ -105,3 +105,6 @@ namespace Omni
     #endif
     }
 }
+
+#pragma warning( pop )
+ 

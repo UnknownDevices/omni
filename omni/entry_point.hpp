@@ -1,26 +1,32 @@
 #pragma once
 
-#include <omni/window.hpp>
 #include <omni/logger.hpp>
+#include <omni/win/wnd_rscs.hpp>
+#include <omni/win/wnd.hpp>
 
-Omni::Window::WindowImplementer s_window_implementer;
-
-Omni::Window&
-get_window() noexcept
+std::string stream_as_decimals(const std::string& str)
 {
-	return s_window_implementer.as_window_interface();
+	std::string ret = {};
+
+	for (auto itr = str.begin(); itr < str.end(); ++itr)
+		ret.append(std::format("[{:03d}] ", *itr));
+
+	return ret;
 }
 
-int
-wmain(/**int argc, wchar_t** argv**/)
+int wmain(/**int argc, wchar_t** argv**/)
 {
-	using namespace Omni;
-	init();
+	Omni::init();
 
-	auto pos = Window::get_pos_at_monitor_center({480, 720});
-	s_window_implementer = {pos, {480, 720}};
-	get_window().create_sys_window();
+	Omni::Win::WndRscs wnd_rscs;
+	wnd_rscs.start();
+	Omni::Win::Wnd wnd;
+	wnd.start(wnd_rscs);
 
-	trace_log("Exited succesfully.");
+	while (Omni::Win::Wnd::poll_msg());
+
+	wnd_rscs.stop();
+
+	Omni::trace_log("Exited succesfully.");
 	return 0;
 }

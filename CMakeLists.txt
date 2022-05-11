@@ -38,24 +38,23 @@ list(APPEND OMNI_H_FILES
     #*.hpp
     omni/entry_point.hpp
     omni/core.hpp
-    omni/tweakme.h
-    omni/math.hpp
-    omni/utility/proc_state.hpp
-    omni/window.hpp
-    omni/window_interface.hpp
+    omni/config.h
     omni/logger.hpp
-    omni/dx12_window.hpp
     omni/utility/function.hpp
     omni/utility/types_pack.hpp
     omni/utility/values_pack.hpp
     omni/random/shuffle_bag.hpp
+    omni/win/wnd.hpp
+    omni/win/wnd_rscs.hpp
+    omni/win/windows.h
 )
 
 list(APPEND OMNI_C_FILES
     #*.cpp
-    omni/dx12_window.cpp
     omni/core.cpp
     omni/logger.cpp
+    omni/win/wnd.cpp
+    omni/win/wnd_rscs.cpp
 )
 
 list(APPEND STATIC_LIB_RES_FILES
@@ -99,6 +98,7 @@ target_precompile_headers(omni
     <fstream>
     <format>
     <streambuf>
+    <limits.h>
     <set>
     <map>
     <unordered_set>
