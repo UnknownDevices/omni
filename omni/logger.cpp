@@ -2,8 +2,7 @@
 
 namespace Omni
 {
-    void
-        Logger::init()
+    void Logger::init()
     {
         spdlog::set_pattern("%^[%T] %n: %v%$");
         s_spdlog_logger = spdlog::stdout_color_mt("OMNI");
@@ -11,11 +10,11 @@ namespace Omni
         trace_log("Logger initialized successfully.");
     }
 
-    void
-        log(Logger::Level level, std::string_view msg)
+    void log(Logger::Level level, std::string_view msg)
     {
         switch (level)
         {
+            
             case Logger::Level::Debug:
                 Logger::s_spdlog_logger->debug(msg);
                 break;

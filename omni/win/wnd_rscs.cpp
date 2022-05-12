@@ -49,12 +49,12 @@ namespace Omni::Win
         wcex.hIconSm       = wcex.hIcon;
 
         m_atom = RegisterClassEx(&wcex);
-        hard_assert(m_atom, "RegisterClassEx failed with code: {}!", GetLastError());
+        omni_hard_assert(m_atom, "RegisterClassEx failed with code: [{}]", GetLastError());
     }
 
     void WndRscs::destroy() 
     {
         bool success = UnregisterClass((LPCSTR)m_atom, s_omni_h_inst);
-        hard_assert(success, "UnregisterClass failed with code: {}!", GetLastError());
+        omni_hard_assert(success, "UnregisterClass failed with code: [{}]", GetLastError());
     }
 }

@@ -72,22 +72,22 @@ namespace Omni::Win
 
         bool success = AdjustWindowRectEx(&wnd_size, WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, 
             false, 0);
-        hard_assert(success, "AdjustWindowRectEx failed with code: {}!", GetLastError());
+        omni_hard_assert(success, "AdjustWindowRectEx failed with code: [{}]", GetLastError());
 
         m_hwnd = CreateWindowEx(0, (LPCSTR)wnd_rscs.get_atom(), "Omni Window", WS_CAPTION |
             WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT,
             wnd_size.right - wnd_size.left, wnd_size.bottom - wnd_size.top, nullptr, nullptr,
             s_omni_h_inst, this);
-        hard_assert(m_hwnd, "CreateWindowEx failed with code: {}!", GetLastError());
+        omni_hard_assert(m_hwnd, "CreateWindowEx failed with code: [{}]", GetLastError());
 
         success = ShowWindowAsync(m_hwnd, SW_SHOW);
-        hard_assert(success, "ShowWindowAsync failed with code: {}!", GetLastError());
+        omni_hard_assert(success, "ShowWindowAsync failed with code: [{}]", GetLastError());
     }
 
     void Wnd::destroy()
     {
         bool success = DestroyWindow(m_hwnd);
-        hard_assert(success, "DestroyWindow failed with code: {}!", GetLastError());
+        omni_hard_assert(success, "DestroyWindow failed with code: [{}]", GetLastError());
         PostQuitMessage(0);
     }
 }
