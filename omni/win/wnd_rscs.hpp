@@ -16,8 +16,8 @@ namespace Omni::Win
 
         static void increment(std::string& str, size_t begin_i = 0, bool allow_resize = true);
 
-        void start();
-        void stop();
+        void create();
+        void destroy();
 
         ATOM get_atom() const
         {

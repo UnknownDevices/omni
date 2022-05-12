@@ -19,7 +19,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project(omni VERSION 1.0 DESCRIPTION "Omni Engine")
 set(OMNI_VERSION ${omni_VERSION})
 
-option(OMNI_BUILD_AS_SHARED "Build Omni as a dynamic library" ON)
+option(OMNI_BUILD_AS_SHARED "Build Omni as a dynamic library" OFF)
 
 if(${OMNI_BUILD_AS_SHARED})
     set(OMNI_STATIC OFF)

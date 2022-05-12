@@ -19,13 +19,13 @@ int wmain(/**int argc, wchar_t** argv**/)
 	Omni::init();
 
 	Omni::Win::WndRscs wnd_rscs;
-	wnd_rscs.start();
+	wnd_rscs.create();
 	Omni::Win::Wnd wnd;
-	wnd.start(wnd_rscs);
+	wnd.create(wnd_rscs);
 
 	while (Omni::Win::Wnd::poll_msg());
 
-	wnd_rscs.stop();
+	wnd_rscs.destroy();
 
 	Omni::trace_log("Exited succesfully.");
 	return 0;

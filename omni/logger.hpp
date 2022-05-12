@@ -13,7 +13,7 @@ namespace Omni
     class OMNI_API Logger
     {
     public:
-        enum class Level // TODO: Likely needs rethinking
+        enum class Level // TODO: Needs reworking
         {
             Debug    = 0,
             Trace    = 1,
@@ -76,7 +76,6 @@ namespace Omni
         log(Logger::Level::Critical, std::format(fmt, args...));
     }
 
-    // TODO: Should it log line and file on failed assert?
     template<typename ... Args>
     void soft_assert(bool to_assert, std::string_view fmt, Args&& ... args)
     {

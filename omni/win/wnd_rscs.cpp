@@ -29,14 +29,14 @@ namespace Omni::Win
         }
     }
 
-    void WndRscs::start()
+    void WndRscs::create()
     {
         increment(s_class_name, 5);
         
         WNDCLASSEX wcex = {0};
         wcex.cbSize        = sizeof(WNDCLASSEX);
         wcex.style         = CS_OWNDC;
-        wcex.lpfnWndProc   = Wnd::wnd_proc;
+        wcex.lpfnWndProc   = Wnd::proc_wnd_creation_msgs;
         wcex.cbClsExtra    = 0;
         wcex.cbWndExtra    = 0;
         wcex.hInstance     = s_omni_h_inst;
@@ -52,9 +52,9 @@ namespace Omni::Win
         hard_assert(m_atom, "RegisterClassEx failed with code: {}!", GetLastError());
     }
 
-    void WndRscs::stop() 
+    void WndRscs::destroy() 
     {
-        bool succeded = UnregisterClass((LPCSTR)m_atom, s_omni_h_inst);
-        hard_assert(succeded, "UnregisterClass failed with code: {}!", GetLastError());
+        bool success = UnregisterClass((LPCSTR)m_atom, s_omni_h_inst);
+        hard_assert(success, "UnregisterClass failed with code: {}!", GetLastError());
     }
 }
