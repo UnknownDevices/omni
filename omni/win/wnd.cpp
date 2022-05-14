@@ -76,7 +76,7 @@ namespace Omni::Win
 
         m_hwnd = CreateWindowEx(0, (LPCTSTR)wnd_rscs.get_atom(),title, style, x, y,
             size.right - size.left, size.bottom - size.top, nullptr, nullptr, s_omni_h_inst, this);
-        omni_assert_win32_call(!m_hwnd, CreateWindowEx);
+        omni_assert_win32_call(m_hwnd, CreateWindowEx);
 
         success = ShowWindowAsync(m_hwnd, SW_SHOW);
         omni_assert_win32_call(success, ShowWindowAsync);
