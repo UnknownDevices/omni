@@ -10,7 +10,7 @@ namespace Omni
         trace_log("Logger initialized successfully.");
     }
 
-    void log(Logger::Level level, fmt::string_view msg)
+    void Logger::log(Logger::Level level, fmt::string_view msg)
     {
         switch (level)
         {
