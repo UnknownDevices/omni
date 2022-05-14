@@ -2,8 +2,6 @@
 
 #include <omni/utility/values_pack.hpp>
 
-// TODO: Should this be inside Omni namespace??
-
 template <typename... Types>
 class Types_Pack;
 
@@ -66,7 +64,6 @@ namespace Types_Pack_Details
 	consteval auto reverse(Types_Pack<Rets...>, Types_Pack<Rems...>);
 }
 
-// TODO: Write asserts
 template <typename... Types>
 class Types_Pack
 {

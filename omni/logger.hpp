@@ -13,7 +13,8 @@ namespace Omni
     class OMNI_API Logger
     {
     public:
-        enum class Level // TODO: Needs reworking
+        // TODO: Needs reworking
+        enum class Level
         {
             Debug    = 0,
             Trace    = 1,
@@ -33,7 +34,7 @@ namespace Omni
         static inline std::shared_ptr<spdlog::logger> s_spdlog_logger;
     };
 
-    // TODO: Use FMT library instead
+    // TODO: Switch to FMT library
     template<typename ... MsgArgs>
     void log(Logger::Level level, std::string_view msg_fmt, const MsgArgs& ... msg_args)
     {
