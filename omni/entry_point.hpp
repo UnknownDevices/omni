@@ -27,6 +27,7 @@ int wmain(/**int argc, wchar_t** argv**/)
 
 	wnd_rscs.destroy();
 
-	Omni::trace_log("Exited successfully.");
+	int ret = 0;
+	Omni::trace_log("Returning with code: [{}].", ret);
 	return 0;
 }

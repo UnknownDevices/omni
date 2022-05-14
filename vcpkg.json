@@ -4,6 +4,7 @@
   "description": "Omni Engine",
   "license": "MIT",
   "dependencies": [
-    "magic-enum"
+    "magic-enum",
+    "spdlog"
   ]
 }

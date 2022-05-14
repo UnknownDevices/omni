@@ -12,7 +12,7 @@
 
 namespace Omni::Win
 {
-    inline const char* format_win32_error_msg(DWORD error)
+    inline const char* format_win32_error(DWORD error)
     {
         thread_local char msg_buf[OMNI_WINAPI_MAX_STR];
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK | 

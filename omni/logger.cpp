@@ -10,11 +10,10 @@ namespace Omni
         trace_log("Logger initialized successfully.");
     }
 
-    void log(Logger::Level level, std::string_view msg)
+    void log(Logger::Level level, fmt::string_view msg)
     {
         switch (level)
         {
-            
             case Logger::Level::Debug:
                 Logger::s_spdlog_logger->debug(msg);
                 break;

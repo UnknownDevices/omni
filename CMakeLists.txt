@@ -12,7 +12,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/bin/min_size_r
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin/rel_with_deb_info)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin/rel_with_deb_info)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/bin/rel_with_deb_info) 
-set(SPDLOG_USE_STD_FORMAT ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -30,6 +29,7 @@ else()
 endif()
 
 find_package(magic_enum CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 #----------------------------------------------------------------------------------
 # File inclusions
@@ -80,11 +80,6 @@ endif()
 
 set_property(TARGET omni PROPERTY CXX_STANDARD 23)
 set_property(TARGET omni PROPERTY CXX_STANDARD_REQUIRED ON) 
-
-add_subdirectory(vendor/spdlog)
-
-set_property(TARGET spdlog PROPERTY CXX_STANDARD 23)
-set_property(TARGET spdlog PROPERTY CXX_STANDARD_REQUIRED ON) 
 
 add_subdirectory(examples/sandbox)
 
