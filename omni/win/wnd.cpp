@@ -40,7 +40,7 @@ namespace Omni::Win
                     reinterpret_cast<LONG_PTR>(p_create.lpCreateParams));
                 SetWindowLongPtr(hwnd, GWLP_WNDPROC,
                     reinterpret_cast<LONG_PTR>(&proc_wnd_msgs));
-                return 1;
+                break;
             }
         }
 
@@ -62,32 +62,30 @@ namespace Omni::Win
         return true;
     }
 
-    void Wnd::create(WndRscs& wnd_rscs, int width, int height)
+    void Wnd::create(WndRscs& wnd_rscs, const char* title, int x, int y, int width, 
+        int height, DWORD style)
     {
-        RECT wnd_size;
-        wnd_size.top = 0;
-        wnd_size.bottom = height;
-        wnd_size.left = 0;
-        wnd_size.right = width;
+        RECT size;
+        size.top = 0;
+        size.bottom = height;
+        size.left = 0;
+        size.right = width;
 
-        bool success = AdjustWindowRectEx(&wnd_size, WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, 
-            false, 0);
-        omni_hard_assert(success, "AdjustWindowRectEx failed with code: [{}]", GetLastError());
+        bool success = AdjustWindowRectEx(&size, style, false, 0);
+        omni_assert_win32_call(success, AdjustWindowRectEx);
 
-        m_hwnd = CreateWindowEx(0, (LPCSTR)wnd_rscs.get_atom(), "Omni Window", WS_CAPTION |
-            WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT,
-            wnd_size.right - wnd_size.left, wnd_size.bottom - wnd_size.top, nullptr, nullptr,
-            s_omni_h_inst, this);
-        omni_hard_assert(m_hwnd, "CreateWindowEx failed with code: [{}]", GetLastError());
+        m_hwnd = CreateWindowEx(0, (LPCTSTR)wnd_rscs.get_atom(),title, style, x, y,
+            size.right - size.left, size.bottom - size.top, nullptr, nullptr, s_omni_h_inst, this);
+        omni_assert_win32_call(!m_hwnd, CreateWindowEx);
 
         success = ShowWindowAsync(m_hwnd, SW_SHOW);
-        omni_hard_assert(success, "ShowWindowAsync failed with code: [{}]", GetLastError());
+        omni_assert_win32_call(success, ShowWindowAsync);
     }
 
     void Wnd::destroy()
     {
         bool success = DestroyWindow(m_hwnd);
-        omni_hard_assert(success, "DestroyWindow failed with code: [{}]", GetLastError());
+        omni_assert_win32_call(success, DestroyWindow);
         PostQuitMessage(0);
     }
 }

@@ -20,8 +20,16 @@ namespace Omni::Win
 
         static bool poll_msg();
 
-        void create(WndRscs& wnd_rscs, int width = 720, int height = 480);
+        void create(WndRscs& wnd_rscs, 
+            const char* title = "Omni Window", 
+            int x = CW_USEDEFAULT, 
+            int y = CW_USEDEFAULT, 
+            int width = 720,
+            int height = 480, 
+            DWORD style = DefaultStyle);
         void destroy();
+
+        static constexpr DWORD DefaultStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 
     private:
         HWND m_hwnd;

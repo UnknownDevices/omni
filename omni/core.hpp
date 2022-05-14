@@ -64,7 +64,6 @@ namespace Omni
     typedef uint_least32_t uint32_least;
     typedef uint_least64_t uint64_least;
 
-    // inline bool quit_requested;
 #if OMNI_STATIC
     inline HINSTANCE s_exe_h_inst;
     inline HINSTANCE& s_omni_h_inst = s_exe_h_inst;
@@ -73,15 +72,12 @@ namespace Omni
     inline HINSTANCE s_omni_h_inst;
 #endif
 
-    constexpr auto
-        make_bit_flag(auto x)
+    constexpr auto make_bit_flag(auto x)
     {
         return 1U << x >> 1U;
     }
 
-    void OMNI_API
-        init();
+    void OMNI_API init();
 
-    HMODULE OMNI_API
-        get_this_module_handle();
+    HMODULE OMNI_API get_this_module_handle();
 }

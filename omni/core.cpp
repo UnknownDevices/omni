@@ -4,8 +4,7 @@
 
 namespace Omni
 {
-    void
-        init()
+    void init()
     {
         Logger::init();
 
@@ -19,8 +18,7 @@ namespace Omni
         trace_log("Initialized successfully.");
     }
 
-    HMODULE
-        get_this_module_handle()
+    HMODULE get_this_module_handle()
     {
         HMODULE h_module;
         ::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
