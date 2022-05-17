@@ -8,12 +8,12 @@ int wmain(/**int argc, wchar_t** argv**/)
 {
 	Omni::init();
 
-	Omni::Win::WndRscs wnd_rscs;
+	Omni::Win::WindowResources wnd_rscs;
 	wnd_rscs.create();
-	Omni::Win::Wnd wnd;
+	Omni::Win::Window wnd;
 	wnd.create(wnd_rscs);
 
-	while (Omni::Win::Wnd::poll_msg());
+	while (Omni::Win::Window::poll_msg());
 
 	wnd_rscs.destroy();
 

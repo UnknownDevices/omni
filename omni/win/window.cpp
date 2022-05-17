@@ -5,7 +5,7 @@
 
 namespace Omni::Win
 {
-    LRESULT CALLBACK Wnd::proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM wparam, LPARAM lparam)
+    LRESULT CALLBACK Window::proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM wparam, LPARAM lparam)
     {
         const auto u_lparam = *reinterpret_cast<uint64*>(&lparam);
         const auto u_wparam  = *reinterpret_cast<uint64*>(&wparam);
@@ -14,7 +14,7 @@ namespace Omni::Win
         {
             case WM_DESTROY:
             {
-                auto& wnd = *reinterpret_cast<Wnd*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+                auto& wnd = *reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
                 wnd.destroy();
                 return 0;
             }
@@ -146,7 +146,7 @@ namespace Omni::Win
         return DefWindowProc(hwnd, msg_type, wparam, lparam);
     }
 
-    LRESULT CALLBACK Wnd::proc_wnd_creation_msgs(HWND hwnd, UINT msg_type, WPARAM w_param,
+    LRESULT CALLBACK Window::proc_wnd_creation_msgs(HWND hwnd, UINT msg_type, WPARAM w_param,
         LPARAM l_param)
     {
         switch (msg_type)
@@ -165,7 +165,7 @@ namespace Omni::Win
         return DefWindowProc(hwnd, msg_type, w_param, l_param);
     }
 
-    bool Wnd::poll_msg()
+    bool Window::poll_msg()
     {
         static MSG msg;
         if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -180,8 +180,8 @@ namespace Omni::Win
         return true;
     }
 
-    void Wnd::create(WndRscs& wnd_rscs, const char* title, int x, int y, int width,
-        int height, DWORD style)
+    void Window::create(WindowResources& wnd_resources, const char* title, int x, int y, 
+        int width, int height, DWORD style)
     {
         RECT size;
         size.top = 0;
@@ -192,7 +192,7 @@ namespace Omni::Win
         bool success = AdjustWindowRectEx(&size, style, false, 0);
         omni_assert_win32_call(success, AdjustWindowRectEx);
 
-        m_hwnd = CreateWindowEx(0, (LPCTSTR)wnd_rscs.get_atom(), title, style, x, y,
+        m_hwnd = CreateWindowEx(0, (LPCTSTR)wnd_resources.get_atom(), title, style, x, y,
             size.right - size.left, size.bottom - size.top, nullptr, nullptr, s_omni_h_inst, this);
         omni_assert_win32_call(m_hwnd, CreateWindowEx);
 
@@ -200,7 +200,7 @@ namespace Omni::Win
         omni_assert_win32_call(success, ShowWindowAsync);
     }
 
-    void Wnd::destroy()
+    void Window::destroy()
     {
         bool success = DestroyWindow(m_hwnd);
         omni_assert_win32_call(success, DestroyWindow);

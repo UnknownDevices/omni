@@ -8,11 +8,11 @@
 
 namespace Omni::Win
 {
-    class OMNI_API WndRscs
+    class OMNI_API WindowResources
     {
     public:
-        OMNI_CONSTEXPR WndRscs() noexcept = default;
-        OMNI_CONSTEXPR ~WndRscs() noexcept = default;
+        OMNI_CONSTEXPR WindowResources() noexcept = default;
+        OMNI_CONSTEXPR ~WindowResources() noexcept = default;
 
         static void increment(std::string& str, size_t begin_i = 0, bool allow_resize = true);
 

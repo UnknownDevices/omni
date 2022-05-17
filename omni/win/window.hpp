@@ -7,11 +7,11 @@
 
 namespace Omni::Win
 {
-    class OMNI_API Wnd
+    class OMNI_API Window
     {
     public:
-        OMNI_CONSTEXPR Wnd() noexcept = default;
-        OMNI_CONSTEXPR ~Wnd() noexcept = default;
+        OMNI_CONSTEXPR Window() noexcept = default;
+        OMNI_CONSTEXPR ~Window() noexcept = default;
 
         static LRESULT CALLBACK proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM w_param, 
             LPARAM l_param);
@@ -21,7 +21,7 @@ namespace Omni::Win
 
         static bool poll_msg();
 
-        void create(WndRscs& wnd_rscs, 
+        void create(WindowResources& wnd_resources, 
             const char* title = "Omni Window", 
             int x = CW_USEDEFAULT, 
             int y = CW_USEDEFAULT, 
