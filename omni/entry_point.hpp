@@ -8,14 +8,14 @@ int wmain(/**int argc, wchar_t** argv**/)
 {
 	Omni::init();
 
-	Omni::Win::WindowResources wnd_rscs;
-	wnd_rscs.create();
+	Omni::Win::WindowResources wnd_resources;
+	wnd_resources.create();
 	Omni::Win::Window wnd;
-	wnd.create(wnd_rscs);
+	wnd.create(wnd_resources);
 
 	while (Omni::Win::Window::poll_msg());
 
-	wnd_rscs.destroy();
+	wnd_resources.destroy();
 
 	int ret = 0;
 	Omni::trace_log("Returning with code: [{}].", ret);

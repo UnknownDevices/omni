@@ -10,14 +10,16 @@ namespace Omni::Win
     class OMNI_API Window
     {
     public:
+        static constexpr DWORD DefaultStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+
         OMNI_CONSTEXPR Window() noexcept = default;
         OMNI_CONSTEXPR ~Window() noexcept = default;
 
-        static LRESULT CALLBACK proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM w_param, 
-            LPARAM l_param);
+        static LRESULT CALLBACK proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM wparam, 
+            LPARAM lparam);
 
-        static LRESULT CALLBACK proc_wnd_creation_msgs(HWND hwnd, UINT msg_type, WPARAM w_param, 
-            LPARAM l_param);
+        static LRESULT CALLBACK proc_wnd_creation_msgs(HWND hwnd, UINT msg_type, WPARAM wparam, 
+            LPARAM lparam);
 
         static bool poll_msg();
 
@@ -32,9 +34,7 @@ namespace Omni::Win
 
         void add_callback();
 
-        static constexpr DWORD DefaultStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
-
     private:
-        HWND m_hwnd;
+        HWND hwnd_;
     };
 }

@@ -39,8 +39,8 @@ namespace Omni::Win
         wcex.lpfnWndProc   = Window::proc_wnd_creation_msgs;
         wcex.cbClsExtra    = 0;
         wcex.cbWndExtra    = 0;
-        wcex.hInstance     = s_omni_h_inst;
-        wcex.hIcon         = static_cast<HICON>(LoadImage(s_omni_h_inst, 
+        wcex.hInstance     = omni_hinst;
+        wcex.hIcon         = static_cast<HICON>(LoadImage(omni_hinst, 
             MAKEINTRESOURCE(ICON_MAIN), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR));
         wcex.hCursor       = nullptr;
         wcex.hbrBackground = nullptr;
@@ -48,13 +48,13 @@ namespace Omni::Win
         wcex.lpszClassName = s_class_name.data();
         wcex.hIconSm       = wcex.hIcon;
 
-        m_atom = RegisterClassEx(&wcex);
-        omni_assert_win32_call(m_atom, RegisterClassEx);
+        atom_ = RegisterClassEx(&wcex);
+        omni_assert_win32_call(atom_, RegisterClassEx);
     }
 
     void WindowResources::destroy() 
     {
-        bool success = UnregisterClass((LPCSTR)m_atom, s_omni_h_inst);
+        bool success = UnregisterClass((LPCSTR)atom_, omni_hinst);
         omni_assert_win32_call(success, UnregisterClass);
     }
 }

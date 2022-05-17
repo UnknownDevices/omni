@@ -34,7 +34,7 @@ namespace Omni
         static void log(Logger::Level level, fmt::string_view msg);
 
     private:
-        static inline std::shared_ptr<spdlog::logger> s_spdlog_logger;
+        static inline std::shared_ptr<spdlog::logger> spdlog_logger_;
     };
 
     template<typename TMsg>

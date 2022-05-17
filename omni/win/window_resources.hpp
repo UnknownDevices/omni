@@ -21,13 +21,13 @@ namespace Omni::Win
 
         ATOM get_atom() const
         {
-            return m_atom;
+            return atom_;
         }
 
     private:
         constexpr static size_t s_begin = 5;
         inline static std::string s_class_name = "omni-";
-        ATOM m_atom;
+        ATOM atom_;
     };
 }
 

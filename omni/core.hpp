@@ -66,11 +66,11 @@ namespace Omni
     typedef uint_least64_t uint64_least;
 
 #if OMNI_STATIC
-    inline HINSTANCE s_exe_h_inst;
-    inline HINSTANCE& s_omni_h_inst = s_exe_h_inst;
+    inline HINSTANCE exe_hinst;
+    inline HINSTANCE& omni_hinst = exe_hinst;
 #else
-    inline HINSTANCE s_exe_h_inst;
-    inline HINSTANCE s_omni_h_inst;
+    inline HINSTANCE exe_hinst;
+    inline HINSTANCE omni_hinst;
 #endif
 
     constexpr auto make_bit_flag(auto x) noexcept

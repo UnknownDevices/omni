@@ -5,8 +5,8 @@ namespace Omni
     void Logger::init()
     {
         spdlog::set_pattern("%^[%T] %n: %v%$");
-        s_spdlog_logger = spdlog::stdout_color_mt("OMNI");
-        s_spdlog_logger->set_level(spdlog::level::trace);
+        spdlog_logger_ = spdlog::stdout_color_mt("OMNI");
+        spdlog_logger_->set_level(spdlog::level::trace);
         trace_log("Logger initialized successfully.");
     }
 
@@ -15,22 +15,22 @@ namespace Omni
         switch (level)
         {
             case Logger::Level::Debug:
-                Logger::s_spdlog_logger->debug(msg);
+                Logger::spdlog_logger_->debug(msg);
                 break;
             case Logger::Level::Trace:
-                Logger::s_spdlog_logger->trace(msg);
+                Logger::spdlog_logger_->trace(msg);
                 break;
             case Logger::Level::Info:
-                Logger::s_spdlog_logger->info(msg);
+                Logger::spdlog_logger_->info(msg);
                 break;
             case Logger::Level::Warn:
-                Logger::s_spdlog_logger->warn(msg);
+                Logger::spdlog_logger_->warn(msg);
                 break;
             case Logger::Level::Error:
-                Logger::s_spdlog_logger->error(msg);
+                Logger::spdlog_logger_->error(msg);
                 break;
             case Logger::Level::Critical:
-                Logger::s_spdlog_logger->critical(msg);
+                Logger::spdlog_logger_->critical(msg);
                 break;
         }
     }

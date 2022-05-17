@@ -192,17 +192,17 @@ namespace Omni::Win
         bool success = AdjustWindowRectEx(&size, style, false, 0);
         omni_assert_win32_call(success, AdjustWindowRectEx);
 
-        m_hwnd = CreateWindowEx(0, (LPCTSTR)wnd_resources.get_atom(), title, style, x, y,
-            size.right - size.left, size.bottom - size.top, nullptr, nullptr, s_omni_h_inst, this);
-        omni_assert_win32_call(m_hwnd, CreateWindowEx);
+        hwnd_ = CreateWindowEx(0, (LPCTSTR)wnd_resources.get_atom(), title, style, x, y,
+            size.right - size.left, size.bottom - size.top, nullptr, nullptr, omni_hinst, this);
+        omni_assert_win32_call(hwnd_, CreateWindowEx);
 
-        success = ShowWindowAsync(m_hwnd, SW_SHOW);
+        success = ShowWindowAsync(hwnd_, SW_SHOW);
         omni_assert_win32_call(success, ShowWindowAsync);
     }
 
     void Window::destroy()
     {
-        bool success = DestroyWindow(m_hwnd);
+        bool success = DestroyWindow(hwnd_);
         omni_assert_win32_call(success, DestroyWindow);
         PostQuitMessage(0);
     }
