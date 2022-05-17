@@ -1,6 +1,6 @@
 #pragma once
 
-#include <omni/win/windows.h>
+#include <omni/win/incl_windows.h>
 #include <omni/config.h>
 
 #if OMNI_STATIC
@@ -27,6 +27,7 @@
 
 #define OMNI_CONSTEXPR constexpr
 #define OMNI_CONSTEVAL consteval
+#define OMNI_NODISCARD [[nodiscard]]
 #define OMNI_INLINE inline
 
 #if OMNI_DISABLE_FORCEINLINE
@@ -72,9 +73,26 @@ namespace Omni
     inline HINSTANCE s_omni_h_inst;
 #endif
 
-    constexpr auto make_bit_flag(auto x)
+    constexpr auto make_bit_flag(auto x) noexcept
     {
         return 1U << x >> 1U;
+    }
+
+    constexpr uint8_fast* as_byte_arr(auto* x) noexcept
+    {
+        return static_cast<char*>(static_cast<void*>(&x));
+    }
+
+    constexpr uint8_fast* as_byte_arr(const auto* x) noexcept
+    {
+        return static_cast<char*>(static_cast<void*>(&x));
+    }
+
+    template<typename TSource>
+    constexpr TSource get_bit_range(TSource source, auto incl_begin, auto excl_end) noexcept
+    {
+        TSource mask = ~(~TSource(0) << (excl_end - incl_begin));
+        return (source >> incl_begin) & mask;
     }
 
     void OMNI_API init();

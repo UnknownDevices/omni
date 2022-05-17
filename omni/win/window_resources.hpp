@@ -4,7 +4,7 @@
 #pragma warning( disable : 4251 )
 
 #include <omni/core.hpp>
-#include <omni/win/windows.h>
+#include <omni/win/incl_windows.h>
 
 namespace Omni::Win
 {

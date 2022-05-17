@@ -44,17 +44,18 @@ list(APPEND OMNI_H_FILES
     omni/utility/types_pack.hpp
     omni/utility/values_pack.hpp
     omni/random/shuffle_bag.hpp
-    omni/win/wnd.hpp
-    omni/win/wnd_rscs.hpp
-    omni/win/windows.h
+    omni/win/window.hpp
+    omni/win/window_event.hpp
+    omni/win/window_resources.hpp
+    omni/win/incl_windows.h
 )
 
 list(APPEND OMNI_C_FILES
     #*.cpp
     omni/core.cpp
     omni/logger.cpp
-    omni/win/wnd.cpp
-    omni/win/wnd_rscs.cpp
+    omni/win/window.cpp
+    omni/win/window_resources.cpp
 )
 
 list(APPEND STATIC_LIB_RES_FILES
@@ -87,6 +88,7 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT s
 
 target_precompile_headers(omni
     PUBLIC
+    <bitset>
     <coroutine>
     <vector>
     <array>

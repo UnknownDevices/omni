@@ -1,8 +1,9 @@
 #pragma once
 
 #include <omni/core.hpp>
-#include <omni/win/windows.h>
-#include <omni/win/wnd_rscs.hpp>
+#include <omni/win/incl_windows.h>
+#include <omni/win/window_resources.hpp>
+#include <omni/win/window_event.hpp>
 
 namespace Omni::Win
 {
@@ -28,6 +29,8 @@ namespace Omni::Win
             int height = 480, 
             DWORD style = DefaultStyle);
         void destroy();
+
+        void add_callback();
 
         static constexpr DWORD DefaultStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 

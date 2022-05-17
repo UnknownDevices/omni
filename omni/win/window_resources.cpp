@@ -1,7 +1,7 @@
-#include <omni/win/wnd_rscs.hpp>
+#include <omni/win/window_resources.hpp>
 
 #include <omni/resource.h>
-#include <omni/win/wnd.hpp>
+#include <omni/win/window.hpp>
 #include <omni/logger.hpp>
 
 namespace Omni::Win
