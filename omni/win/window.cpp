@@ -2,14 +2,17 @@
 
 #include <omni/resource.h>
 #include <omni/logger.hpp>
+#include <omni/utility/types_pack.hpp>
 
 namespace Omni::Win
 {
+    Window& Window::get_user_data(HWND hwnd)
+    {
+        return *reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    }
+
     LRESULT CALLBACK Window::proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM wparam, LPARAM lparam)
     {
-        const auto u_lparam = *reinterpret_cast<uint64*>(&lparam);
-        const auto u_wparam  = *reinterpret_cast<uint64*>(&wparam);
-        
         switch (msg_type)
         {
             case WM_DESTROY:
@@ -28,113 +31,57 @@ namespace Omni::Win
             }
             case WM_LBUTTONDOWN:
             {
-                auto button_down = ButtonDownEvent(
-                    *(reinterpret_cast<int16*>(&lparam)),
-                    *(reinterpret_cast<int16*>(&lparam) + 1),
-                    *(reinterpret_cast<uint8*>(&wparam)));
-
-                debug_log("button_down: [{}]", button_down);
-                break;
-            }
-            case WM_LBUTTONUP:
-            {
-                auto button_up = ButtonUpEvent(
-                    *(reinterpret_cast<int16*>(&lparam)),
-                    *(reinterpret_cast<int16*>(&lparam) + 1),
-                    *(reinterpret_cast<uint8*>(&wparam)));
-
-                debug_log("button_up: [{}]", button_up);
-                break;
+                Window::pv_proc_button_down_msg(hwnd, wparam, lparam);
+                return 0;
             }
             case WM_RBUTTONDOWN:
             {
-                auto button_down = ButtonDownEvent(
-                    static_cast<int16>(get_bit_range(lparam, 0, 16)),
-                    static_cast<int16>(get_bit_range(lparam, 16, 32)),
-                    static_cast<uint8>(u_wparam));
-
-                debug_log("button_down: [{}]", button_down);
-                break;
-            }
-            case WM_RBUTTONUP:
-            {
-                auto button_up = ButtonUpEvent(
-                    static_cast<int16>(get_bit_range(lparam, 0, 16)),
-                    static_cast<int16>(get_bit_range(lparam, 16, 32)),
-                    static_cast<uint8>(u_wparam));
-
-                debug_log("button_up: [{}]", button_up);
-                break;
+                Window::pv_proc_button_down_msg(hwnd, wparam, lparam);
+                return 0;
             }
             case WM_MBUTTONDOWN:
             {
-                auto button_down = ButtonDownEvent(
-                    static_cast<int16>(get_bit_range(lparam, 0, 16)),
-                    static_cast<int16>(get_bit_range(lparam, 16, 32)),
-                    static_cast<uint8>(u_wparam));
-
-                debug_log("button_down: [{}]", button_down);
-                break;
-            }
-            case WM_MBUTTONUP:
-            {
-                auto button_up = ButtonUpEvent(
-                    static_cast<int16>(get_bit_range(lparam, 0, 16)),
-                    static_cast<int16>(get_bit_range(lparam, 16, 32)),
-                    static_cast<uint8>(u_wparam));
-
-                debug_log("button_up: [{}]", button_up);
-                break;
+                Window::pv_proc_button_down_msg(hwnd, wparam, lparam);
+                return 0;
             }
             case WM_XBUTTONDOWN:
             {
-                auto button_down = ButtonDownEvent(
-                    static_cast<int16>(get_bit_range(lparam, 0, 16)),
-                    static_cast<int16>(get_bit_range(lparam, 16, 32)),
-                    static_cast<uint8>(u_wparam));
-
-                debug_log("button_down: [{}]", button_down);
-                break;
+                Window::pv_proc_button_down_msg(hwnd, wparam, lparam);
+                return 0;
+            }
+            case WM_LBUTTONUP:
+            {
+                Window::pv_proc_button_up_msg(hwnd, wparam, lparam);
+                return 0;
+            }
+            case WM_RBUTTONUP:
+            {
+                Window::pv_proc_button_up_msg(hwnd, wparam, lparam);
+                return 0;
+            }
+            case WM_MBUTTONUP:
+            {
+                Window::pv_proc_button_up_msg(hwnd, wparam, lparam);
+                return 0;
             }
             case WM_XBUTTONUP:
             {
-                auto button_up = ButtonUpEvent(
-                    static_cast<int16>(get_bit_range(lparam, 0, 16)),
-                    static_cast<int16>(get_bit_range(lparam, 16, 32)),
-                    static_cast<uint8>(u_wparam));
-
-                debug_log("button_up: [{}]", button_up);
-                break;
+                Window::pv_proc_button_up_msg(hwnd, wparam, lparam);
+                return 0;
             }
             case WM_KEYDOWN:
             {
-                auto key_down = KeyDownEvent(
-                    static_cast<uint16>(u_wparam),
-                    static_cast<uint16>(get_bit_range(u_lparam, 16, 24)),
-                    static_cast<uint16>(get_bit_range(u_lparam, 0 , 16)),
-                    static_cast<uint8> (get_bit_range(u_lparam, 30, 31)),
-                    static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
-
-                debug_log("key_down: [{}]", key_down);
+                Window::pv_proc_key_down_msg(hwnd, wparam, lparam);
                 break;
             }
             case WM_KEYUP:
             {
-                auto key_up = KeyUpEvent(
-                    static_cast<uint16>(u_wparam),
-                    static_cast<uint16>(get_bit_range(u_lparam, 16, 24)),
-                    static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
-
-                debug_log("key_up: [{}]", key_up);
+                Window::pv_proc_key_up_msg(hwnd, wparam, lparam);
                 break;
             }
             case WM_CHAR:
             {
-                auto char_event = CharEvent(
-                    static_cast<char> (wparam),
-                    static_cast<uint8>(get_bit_range(u_lparam, 30, 31)));
-
-                debug_log("char_event: [{}]", char_event);
+                Window::pv_proc_char_msg(hwnd, wparam, lparam);
                 break;
             }
             case WM_MENUCHAR:
@@ -206,4 +153,99 @@ namespace Omni::Win
         omni_assert_win32_call(success, DestroyWindow);
         PostQuitMessage(0);
     }
+
+    bool Window::pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
+    {
+        auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
+
+        auto button_up_event = ButtonUpEvent(
+            *(reinterpret_cast<int16*>(&lparam)),
+            *(reinterpret_cast<int16*>(&lparam) + 1),
+            *(reinterpret_cast<uint8*>(&u_wparam)));
+
+        for (auto callback : Window::get_user_data(hwnd).button_up_callbacks_)
+        {
+            if (callback(&button_up_event)) 
+                return true;
+        }
+
+        return false;
+    }
+
+    bool Window::pv_proc_button_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
+    {
+        auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
+
+        auto button_down_event = ButtonDownEvent(
+            *(reinterpret_cast<int16*>(&lparam)),
+            *(reinterpret_cast<int16*>(&lparam) + 1),
+            *(reinterpret_cast<uint8*>(&u_wparam)));
+
+        for (auto callback : Window::get_user_data(hwnd).button_down_callbacks_)
+        {
+            if (callback(&button_down_event)) 
+                return true;
+        }
+
+        return false;
+    }
+    
+    bool Window::pv_proc_key_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
+    {
+        auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
+        auto& u_lparam = *reinterpret_cast<uint64*>(&lparam);
+
+        // TODO: Win32 may provide methods to access these data
+        auto key_down_event = KeyDownEvent(
+            static_cast<uint16>(u_wparam),
+            static_cast<uint16>(get_bit_range(u_lparam, 16, 24)),
+            static_cast<uint16>(get_bit_range(u_lparam, 0 , 16)),
+            static_cast<uint8> (get_bit_range(u_lparam, 30, 31)),
+            static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
+
+        for (auto callback : Window::get_user_data(hwnd).key_down_callbacks_)
+        {
+            if (callback(&key_down_event)) 
+                return true;
+        }
+
+        return false;
+    }
+    
+    bool Window::pv_proc_key_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
+    {
+        auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
+        auto& u_lparam = *reinterpret_cast<uint64*>(&lparam);
+
+        auto key_up_event = KeyUpEvent(
+            static_cast<uint16>(u_wparam),
+            static_cast<uint16>(get_bit_range(u_lparam, 16, 24)),
+            static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
+
+        for (auto callback : Window::get_user_data(hwnd).key_up_callbacks_)
+        {
+            if (callback(&key_up_event)) 
+                return true;
+        }
+
+        return false;
+    }
+    
+    bool Window::pv_proc_char_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
+    {
+        auto& u_lparam = *reinterpret_cast<uint64*>(&lparam);
+
+        auto char_event = CharEvent(
+            static_cast<char> (wparam),
+            static_cast<uint8>(get_bit_range(u_lparam, 30, 31))); 
+
+        for (auto callback : Window::get_user_data(hwnd).char_callbacks_)
+        {
+            if (callback(&char_event)) 
+                return true;
+        }
+
+        return false;
+    }
+
 }

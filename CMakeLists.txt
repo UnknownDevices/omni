@@ -40,9 +40,12 @@ list(APPEND OMNI_H_FILES
     omni/core.hpp
     omni/config.h
     omni/logger.hpp
-    omni/utility/function.hpp
+    omni/app.hpp
     omni/utility/types_pack.hpp
     omni/utility/values_pack.hpp
+    omni/utility/delegate.hpp
+    omni/utility/delegate_base.hpp
+    omni/utility/multicast_delegate.hpp
     omni/random/shuffle_bag.hpp
     omni/win/window.hpp
     omni/win/window_event.hpp

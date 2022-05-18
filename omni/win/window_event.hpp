@@ -6,32 +6,17 @@
 
 namespace Omni::Win
 {
-    using WindowEventId = uint32;
-
     class WindowEvent
     {
-    public:
-        OMNI_NODISCARD OMNI_CONSTEXPR WindowEventId get_id() const noexcept
-        {
-            return id_;
-        }
-
     protected:
-        OMNI_CONSTEXPR WindowEvent(WindowEventId id) noexcept : id_(id)
-        {}
-
+        OMNI_CONSTEXPR WindowEvent() noexcept = default;
         OMNI_CONSTEXPR ~WindowEvent() noexcept = default;
-
-        WindowEventId id_;
     };
 
     class ButtonDownEvent : public WindowEvent
     {
     public:
-        static constexpr WindowEventId Id = make_bit_flag(1);
-
         constexpr ButtonDownEvent(int16 x, int16 y, uint8 mods) noexcept :
-            WindowEvent(Id), 
             x_(x), 
             y_(y), 
             mods_(mods)
@@ -60,10 +45,7 @@ namespace Omni::Win
     class ButtonUpEvent : public WindowEvent
     {
     public:
-        static constexpr WindowEventId Id = make_bit_flag(2);
-
         constexpr ButtonUpEvent(int16 x, int16 y, uint8 mods) noexcept :
-            WindowEvent(Id), 
             x_(x), 
             y_(y), 
             mods_(mods)
@@ -92,11 +74,8 @@ namespace Omni::Win
     class KeyDownEvent : public WindowEvent
     {
     public:
-        static constexpr WindowEventId Id = make_bit_flag(3);
-
         constexpr KeyDownEvent(uint16 key_code, uint16 scan_code, uint16 repeat_count, 
             uint8 is_hold, uint8 is_extended_key) noexcept :
-            WindowEvent(Id), 
             key_code_(key_code), 
             scan_code_(scan_code),
             repeat_count_(repeat_count),
@@ -137,10 +116,7 @@ namespace Omni::Win
     class KeyUpEvent : public WindowEvent
     {
     public:
-        static constexpr WindowEventId Id = make_bit_flag(4);
-
         constexpr KeyUpEvent(uint16 key_code, uint16 scan_code, uint8 is_extended_key) noexcept :
-            WindowEvent(Id), 
             key_code_(key_code), 
             scan_code_(scan_code),
             is_extended_key_(is_extended_key)
@@ -169,10 +145,7 @@ namespace Omni::Win
     class CharEvent : public WindowEvent
     {
     public:
-        static constexpr WindowEventId Id = make_bit_flag(5);
-
         constexpr CharEvent(char character_code, uint8 is_hold) noexcept :
-            WindowEvent(Id), 
             character_code_(character_code),
             is_hold_(is_hold)
         {}
