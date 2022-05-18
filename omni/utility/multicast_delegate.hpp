@@ -18,62 +18,62 @@
 #pragma once
 #include <omni/utility/delegate.hpp>
 
-namespace SA {
-
-	template<typename RET, typename ...PARAMS>
-	class multicast_delegate<RET(PARAMS...)> final : private delegate_base<RET(PARAMS...)> {
+namespace Omni
+{
+	template<typename TRet, typename ...PARAMS>
+	class MulticastDelegate<TRet(PARAMS...)> final : private DelegateBase<TRet(PARAMS...)> {
 	public:
 
-		constexpr multicast_delegate() = default;
-		~multicast_delegate() {
+		constexpr MulticastDelegate() = default;
+		~MulticastDelegate() {
 			for (auto& element : invocationList) delete element;
 			invocationList.clear();
-		} //~multicast_delegate
+		} //~MulticastDelegate
 
-		bool isNull() const { return invocationList.size() < 1; }
+		bool is_null() const { return invocationList.size() < 1; }
 		bool operator ==(void* ptr) const {
-			return (ptr == nullptr) && this->isNull();
+			return (ptr == nullptr) && this->is_null();
 		} //operator ==
 		bool operator !=(void* ptr) const {
-			return (ptr != nullptr) || (!this->isNull());
+			return (ptr != nullptr) || (!this->is_null());
 		} //operator !=
 
 		size_t size() const { return invocationList.size(); }
 
-		multicast_delegate& operator =(const multicast_delegate&) = delete;
-		multicast_delegate(const multicast_delegate&) = delete;
+		MulticastDelegate& operator =(const MulticastDelegate&) = delete;
+		MulticastDelegate(const MulticastDelegate&) = delete;
 
-		bool operator ==(const multicast_delegate& another) const {
+		bool operator ==(const MulticastDelegate& another) const {
 			if (invocationList.size() != another.invocationList.size()) return false;
 			auto anotherIt = another.invocationList.begin();
 			for (auto it = invocationList.begin(); it != invocationList.end(); ++it)
 				if (**it != **anotherIt) return false;
 			return true;
 		} //==
-		bool operator !=(const multicast_delegate& another) const { return !(*this == another); }
+		bool operator !=(const MulticastDelegate& another) const { return !(*this == another); }
 
-		bool operator ==(const delegate<RET(PARAMS...)>& another) const {
-			if (isNull() && another.isNull()) return true;
-			if (another.isNull() || (size() != 1)) return false;
+		bool operator ==(const Delegate<TRet(PARAMS...)>& another) const {
+			if (is_null() && another.is_null()) return true;
+			if (another.is_null() || (size() != 1)) return false;
 			return (another.invocation == **invocationList.begin());
 		} //==
-		bool operator !=(const delegate<RET(PARAMS...)>& another) const { return !(*this == another); }
+		bool operator !=(const Delegate<TRet(PARAMS...)>& another) const { return !(*this == another); }
 
-		multicast_delegate& operator +=(const multicast_delegate& another) {
+		MulticastDelegate& operator +=(const MulticastDelegate& another) {
 			for (auto& item : another.invocationList) // clone, not copy; flattens hierarchy:
-				this->invocationList.push_back(new typename delegate_base<RET(PARAMS...)>::InvocationElement(item->object, item->stub));
+				this->invocationList.push_back(new typename DelegateBase<TRet(PARAMS...)>::InvocationElement(item->owner, item->stub));
 			return *this;
 		} //operator +=
 
 		template <typename LAMBDA> // template instantiation is not neededm, will be deduced/inferred:
-		multicast_delegate& operator +=(const LAMBDA & lambda) {
-			delegate<RET(PARAMS...)> d = delegate<RET(PARAMS...)>::template create<LAMBDA>(lambda);
+		MulticastDelegate& operator +=(const LAMBDA & lambda) {
+			Delegate<TRet(PARAMS...)> d = Delegate<TRet(PARAMS...)>::template create<LAMBDA>(lambda);
 			return *this += d;
 		} //operator +=
 
-		multicast_delegate& operator +=(const delegate<RET(PARAMS...)>& another) {
-			if (another.isNull()) return *this;
-			this->invocationList.push_back(new typename delegate_base<RET(PARAMS...)>::InvocationElement(another.invocation.object, another.invocation.stub));
+		MulticastDelegate& operator +=(const Delegate<TRet(PARAMS...)>& another) {
+			if (another.is_null()) return *this;
+			this->invocationList.push_back(new typename DelegateBase<TRet(PARAMS...)>::InvocationElement(another.invocation.owner, another.invocation.stub));
 			return *this;
 		} //operator +=
 
@@ -81,30 +81,30 @@ namespace SA {
 		// (for handling return values, see operator(..., handler))
 		void operator()(PARAMS... arg) const {
 			for (auto& item : invocationList)
-				(*(item->stub))(item->object, arg...);
+				(*(item->stub))(item->owner, arg...);
 		} //operator()
 
 		template<typename HANDLER>
 		void operator()(PARAMS... arg, HANDLER handler) const {
 			size_t index = 0;
 			for (auto& item : invocationList) {
-				RET value = (*(item->stub))(item->object, arg...);
+				TRet value = (*(item->stub))(item->owner, arg...);
 				handler(index, &value);
 				++index;
 			} //loop
 		} //operator()
 
-		void operator()(PARAMS... arg, delegate<void(size_t, RET*)> handler) const {
+		void operator()(PARAMS... arg, Delegate<void(size_t, TRet*)> handler) const {
 			operator()<decltype(handler)>(arg..., handler);
 		} //operator()
-		void operator()(PARAMS... arg, std::function<void(size_t, RET*)> handler) const {
+		void operator()(PARAMS... arg, std::function<void(size_t, TRet*)> handler) const {
 			operator()<decltype(handler)>(arg..., handler);
 		} //operator()
 
 	private:
 
-		std::list<typename delegate_base<RET(PARAMS...)>::InvocationElement *> invocationList;
+		std::list<typename DelegateBase<TRet(PARAMS...)>::InvocationElement *> invocationList;
 
-	}; //class multicast_delegate
+	}; //class MulticastDelegate
 
 } /* namespace SA */

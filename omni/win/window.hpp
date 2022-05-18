@@ -13,11 +13,11 @@ namespace Omni::Win
     class OMNI_API Window
     {
     public:
-        using ButtonDownCallback = SA::delegate<bool(ButtonDownEvent*)>;
-        using ButtonUpCallback   = SA::delegate<bool(ButtonUpEvent*)>;
-        using KeyDownCallback    = SA::delegate<bool(KeyDownEvent*)>;
-        using KeyUpCallback      = SA::delegate<bool(KeyUpEvent*)>;
-        using CharCallback       = SA::delegate<bool(CharEvent*)>;
+        using ButtonDownCallback = Delegate<bool(ButtonDownEvent*)>;
+        using ButtonUpCallback   = Delegate<bool(ButtonUpEvent*)>;
+        using KeyDownCallback    = Delegate<bool(KeyDownEvent*)>;
+        using KeyUpCallback      = Delegate<bool(KeyUpEvent*)>;
+        using CharCallback       = Delegate<bool(CharEvent*)>;
 
         static constexpr DWORD DefaultStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 

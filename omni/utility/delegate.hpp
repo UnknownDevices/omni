@@ -1,8 +1,8 @@
 /*
 
 	Copyright (C) 2017 by Sergey A Kryukov: derived work
-	http://www.SAKryukov.org
-	http://www.codeproject.com/Members/SAKryukov
+	http://www.OmniKryukov.org
+	http://www.codeproject.com/Members/OmniKryukov
 
 	Based on original work by Sergey Ryazanov:
 	"The Impossibly Fast C++ Delegates", 18 Jul 2005
@@ -16,171 +16,218 @@
 */
 
 #pragma once
+
 #include <omni/utility/delegate_base.hpp>
 #include <omni/utility/types_pack.hpp>
 
-namespace SA {
+namespace Omni
+{
+	template <typename T> 
+	class Delegate;
 
-	template <typename T> class delegate;
-	template <typename T> class multicast_delegate;
+	template <typename T> 
+	class MulticastDelegate;
 
-	template<typename RET, typename ...PARAMS>
-	class delegate<RET(PARAMS...)> final : private delegate_base<RET(PARAMS...)> {
+	template<typename TRet, typename ... TParams>
+	class Delegate<TRet(TParams...)> final : private DelegateBase<TRet(TParams...)> {
 	public:
+		friend class MulticastDelegate<TRet(TParams...)>;
 
-		delegate() = default;
+		Delegate() = default;
 
-		bool isNull() const { return invocation.stub == nullptr; }
-		bool operator ==(void* ptr) const {
-			return (ptr == nullptr) && this->isNull();
-		} //operator ==
-		bool operator !=(void* ptr) const {
-			return (ptr != nullptr) || (!this->isNull());
-		} //operator !=
+		Delegate(const Delegate& other)
+		{
+			other.invocation.clone(invocation);
+		}
 
-		delegate(const delegate& another) { another.invocation.Clone(invocation); }
+		template <typename TFunctor>
+		Delegate(const TFunctor& functor)
+		{
+			assign((void*)(&functor), const_method_stub<TFunctor, &TFunctor::operator()>);
+		}
 
-		template <typename LAMBDA>
-		delegate(const LAMBDA& lambda) {
-			assign((void*)(&lambda), lambda_stub<LAMBDA>);
-		} //delegate
+		bool is_null() const
+		{
+			return invocation.stub == nullptr;
+		}
 
-		delegate& operator =(const delegate& another) {
-			another.invocation.Clone(invocation);
+		Delegate& operator=(const Delegate& other)
+		{
+			other.invocation.clone(invocation);
 			return *this;
-		} //operator =
+		}
 
-		template <typename LAMBDA> // template instantiation is not needed, will be deduced (inferred):
-		delegate& operator =(const LAMBDA& instance) {
-			assign((void*)(&instance), lambda_stub<LAMBDA>);
+		template <typename TFunctor>
+		Delegate& operator=(const TFunctor& functor)
+		{
+			assign((void*)(&functor), const_method_stub<TFunctor, &TFunctor::operator()>);
 			return *this;
-		} //operator =
+		}
 
-		bool operator == (const delegate& another) const { return invocation == another.invocation; }
-		bool operator != (const delegate& another) const { return invocation != another.invocation; }
+		bool operator==(void* ptr) const
+		{
+			return (ptr == nullptr) && this->is_null();
+		}
 
-		bool operator ==(const multicast_delegate<RET(PARAMS...)>& another) const { return another == (*this); }
-		bool operator !=(const multicast_delegate<RET(PARAMS...)>& another) const { return another != (*this); }
+		bool operator==(const Delegate& other) const
+		{
+			return invocation == other.invocation;
+		}
 
-		template <class T, RET(T::*TMethod)(PARAMS...)>
-		static delegate create(T* instance) {
-			return delegate(instance, method_stub<T, TMethod>);
-		} //create
+		bool operator==(const MulticastDelegate<TRet(TParams...)>& other) const
+		{
+			return other == (*this);
+		}
 
-		template <class T, RET(T::*TMethod)(PARAMS...) const>
-		static delegate create(T const* instance) {
-			return delegate(const_cast<T*>(instance), const_method_stub<T, TMethod>);
-		} //create
+		bool operator!=(void* ptr) const
+		{
+			return (ptr != nullptr) || (!this->is_null());
+		}
 
-		template <RET(*TMethod)(PARAMS...)>
-		static delegate create() {
-			return delegate(nullptr, function_stub<TMethod>);
-		} //create
+		bool operator!=(const Delegate& other) const
+		{
+			return invocation != other.invocation;
+		}
 
-		template <typename LAMBDA>
-		static delegate create(const LAMBDA & instance) {
-			return delegate((void*)(&instance), lambda_stub<LAMBDA>);
-		} //create
+		bool operator!=(const MulticastDelegate<TRet(TParams...)>& other) const
+		{
+			return other != (*this);
+		}
 
-		RET operator()(PARAMS... arg) const {
-			return (*invocation.stub)(invocation.object, arg...);
-		} //operator()
+		template <TRet(*TMethod)(TParams...)>
+		static Delegate create()
+		{
+			return Delegate(nullptr, function_stub<TMethod>);
+		}
+
+		template <class T, TRet(T::*Method)(TParams...)>
+		static Delegate create(T* owner)
+		{
+			return Delegate(owner, method_stub<T, Method>);
+		}
+
+		template <class T, TRet(T::*Method)(TParams...) const>
+		static Delegate create(T const* owner)
+		{
+			return Delegate(const_cast<T*>(owner), const_method_stub<T, Method>);
+		}
+
+		template <typename TFunctor>
+		static Delegate create(const TFunctor* functor)
+		{
+			return Delegate(const_cast<TFunctor*>(functor), 
+				const_method_stub<TFunctor, &TFunctor::operator()>);
+		}
+
+		TRet operator()(TParams... arg) const
+		{
+			return (*invocation.stub)(invocation.owner, arg...);
+		}
 
 	private:
+		Delegate(void* owner, DelegateBase<TRet(TParams...)>::stub_type stub)
+		{
+			invocation.owner = owner;
+			invocation.stub = stub;
+		}
 
-		delegate(void* anObject, typename delegate_base<RET(PARAMS...)>::stub_type aStub) {
-			invocation.object = anObject;
-			invocation.stub = aStub;
-		} //delegate
+		void assign(void* owner, DelegateBase<TRet(TParams...)>::stub_type stub)
+		{
+			this->invocation.owner = owner;
+			this->invocation.stub = stub;
+		}
 
-		void assign(void* anObject, typename delegate_base<RET(PARAMS...)>::stub_type aStub) {
-			this->invocation.object = anObject;
-			this->invocation.stub = aStub;
-		} //assign
+		template <TRet(*Function)(TParams...)>
+		static TRet function_stub(void*, TParams... params)
+		{
+			return (Function)(params...);
+		}
 
-		template <class T, RET(T::*TMethod)(PARAMS...)>
-		static RET method_stub(void* this_ptr, PARAMS... params) {
-			T* p = static_cast<T*>(this_ptr);
-			return (p->*TMethod)(params...);
-		} //method_stub
+		template <class TOwner, TRet(TOwner::*Method)(TParams...)>
+		static TRet method_stub(void* owner, TParams... params)
+		{
+			TOwner* p = static_cast<TOwner*>(owner);
+			return (p->*Method)(params...);
+		}
 
-		template <class T, RET(T::*TMethod)(PARAMS...) const>
-		static RET const_method_stub(void* this_ptr, PARAMS... params) {
-			T* const p = static_cast<T*>(this_ptr);
-			return (p->*TMethod)(params...);
-		} //const_method_stub
+		template <class TOwner, TRet(TOwner::*Method)(TParams...) const>
+		static TRet const_method_stub(void* owner, TParams... params)
+		{
+			TOwner* const p = static_cast<TOwner*>(owner);
+			return (p->*Method)(params...);
+		}
 
-		template <RET(*TMethod)(PARAMS...)>
-		static RET function_stub(void*, PARAMS... params) {
-			return (TMethod)(params...);
-		} //function_stub
+		DelegateBase<TRet(TParams...)>::InvocationElement invocation;
+	};
 
-		template <typename LAMBDA>
-		static RET lambda_stub(void* this_ptr, PARAMS... arg) {
-			LAMBDA* p = static_cast<LAMBDA*>(this_ptr);
-			return (p->operator())(arg...);
-		} //lambda_stub
+	template<typename Type>
+	struct IsDelegate : std::false_type
+	{};
 
-		friend class multicast_delegate<RET(PARAMS...)>;
-		typename delegate_base<RET(PARAMS...)>::InvocationElement invocation;
+	template <typename TRet, typename ... TParams>
+	struct IsDelegate<Delegate<TRet(TParams...)>> : std::true_type
+	{};
 
-	}; //class delegate
+	template<typename Type>
+	struct IsFunctionPtr : std::false_type
+	{};
 
-} /* namespace SA */
+	template <typename TRet, typename ... TParams>
+	struct IsFunctionPtr<TRet(*)(TParams...)> : std::true_type
+	{};
+
+	template<typename Type>
+	struct IsMethodPtr : std::false_type
+	{};
+
+	template <typename TOwner, typename TRet, typename ... TParams>
+	struct IsMethodPtr<TRet(TOwner::*)(TParams...)> : std::true_type
+	{};
+
+	template<typename Type>
+	struct IsConstMethodPtr : std::false_type
+	{};
+
+	template <typename TOwner, typename TRet, typename ... TParams>
+	struct IsConstMethodPtr<TRet(TOwner::*)(TParams...) const> : std::true_type
+	{};
+}
 
 template <typename TRet, typename ... TParams>
-struct ArgsOf<SA::delegate<TRet(TParams...)>>
+struct ArgsOf<Omni::Delegate<TRet(TParams...)>>
 {
-	using Template = SA::delegate;
-	using Args = TypesPack<TRet, TParams...>;
+	using Template = Omni::Delegate;
+	using Args     = TypesPack<TRet, TParams...>;
 
-	using Ret = TRet;
-	using Params = TypesPack<TParams...>;
+	using Ret      = TRet;
+	using Params   = TypesPack<TParams...>;
 };
 
 template <typename TRet, typename ... TParams>
 struct ArgsOf<TRet(*)(TParams...)>
 {
-	using Args = TypesPack<TRet, TParams...>;
-	
-	using Ret = TRet;
+	using Args   = TypesPack<TRet, TParams...>;
+
+	using Ret    = TRet;
 	using Params = TypesPack<TParams...>;
 };
 
 template <typename TOwner, typename TRet, typename ... TParams>
 struct ArgsOf<TRet(TOwner::*)(TParams...)>
 {
-	using Args = TypesPack<TOwner, TRet, TParams...>;
-	
-	using Owner = TOwner;
-	using Ret = TRet;
+	using Args   = TypesPack<TOwner, TRet, TParams...>;
+
+	using Owner  = TOwner;
+	using Ret    = TRet;
 	using Params = TypesPack<TParams...>;
 };
 
 template <typename TOwner, typename TRet, typename ... TParams>
 struct ArgsOf<TRet(TOwner::*)(TParams...) const>
 {
-	using Args = TypesPack<TOwner, TRet, TParams...>;
+	using Args   = TypesPack<TOwner, TRet, TParams...>;
 
-	using Owner = TOwner;
-	using Ret = TRet;
+	using Owner  = TOwner;
+	using Ret    = TRet;
 	using Params = TypesPack<TParams...>;
 };
-
-template<typename Type>
-struct IsFnPtr : std::false_type {};
-
-template <typename TRet, typename ... TParams>
-struct IsFnPtr<TRet(*)(TParams...)> : std::true_type {};
-
-template<typename Type>
-struct IsMemFnPtr : std::false_type {};
-
-template <typename TOwner, typename TRet, typename ... TParams>
-struct IsMemFnPtr<TRet(TOwner::*)(TParams...)> : std::true_type {};
-
-template<typename Type>
-struct IsConstMemFnPtr : std::false_type {};
-
-template <typename TOwner, typename TRet, typename ... TParams>
-struct IsConstMemFnPtr<TRet(TOwner::*)(TParams...) const> : std::true_type {};

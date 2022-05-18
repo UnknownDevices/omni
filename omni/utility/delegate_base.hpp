@@ -17,35 +17,43 @@
 
 #pragma once
 
-namespace SA {
-	
+namespace Omni
+{
 	template<typename T>
-	class delegate_base;
-	
-	template<typename RET, typename ...PARAMS>
-	class delegate_base<RET(PARAMS...)> {
+	class DelegateBase;
 
+	template<typename TRet, typename ...TParams>
+	class DelegateBase<TRet(TParams...)>
+	{
 	protected:
+		using stub_type = TRet(*)(void* owner, TParams...);
 
-		using stub_type = RET(*)(void* this_ptr, PARAMS...);
-
-		struct InvocationElement {
+		struct InvocationElement
+		{
 			constexpr InvocationElement() = default;
-			InvocationElement(void* this_ptr, stub_type aStub) : object(this_ptr), stub(aStub) {}
-			void Clone(InvocationElement& target) const {
+			InvocationElement(void* owner, stub_type stub) : owner(owner), stub(stub)
+			{}
+
+			void clone(InvocationElement& target) const
+			{
 				target.stub = stub;
-				target.object = object;
-			} //Clone
-			bool operator ==(const InvocationElement& another) const {
-				return another.stub == stub && another.object == object;
-			} //==
-			bool operator !=(const InvocationElement& another) const {
-				return another.stub != stub || another.object != object;
-			} //!=
-			void* object = nullptr;
+				target.owner = owner;
+			}
+
+			bool operator==(const InvocationElement& other) const
+			{
+				return other.stub == stub && other.owner == owner;
+			}
+
+			bool operator!=(const InvocationElement& other) const
+			{
+				return other.stub != stub || other.owner != owner;
+			}
+
+			void* owner = nullptr;
 			stub_type stub = nullptr;
-		}; //InvocationElement
+		};
 
-	}; //class delegate_base
+	};
 
-} /* namespace SA */
+}

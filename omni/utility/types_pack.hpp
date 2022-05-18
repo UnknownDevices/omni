@@ -6,10 +6,12 @@ template <typename... Types>
 class TypesPack;
 
 template<typename Type>
-struct IsTypePackInst : std::false_type {};
+struct IsTypePackInst : std::false_type
+{};
 
 template<typename ... Types>
-struct IsTypePackInst<TypesPack<Types...>> : std::true_type {};
+struct IsTypePackInst<TypesPack<Types...>> : std::true_type
+{};
 
 template <typename Type>
 concept TypesPackInst = requires()
@@ -73,8 +75,15 @@ public:
 
 	consteval TypesPack() noexcept = default;
 
-	consteval static auto size() noexcept { return sizeof...(Types); }
-	consteval static auto is_empty() noexcept { return sizeof...(Types) == 0; }
+	consteval static auto size() noexcept
+	{
+		return sizeof...(Types);
+	}
+	
+	consteval static auto is_empty() noexcept
+	{
+		return sizeof...(Types) == 0;
+	}
 
 	template <typename... Concats>
 	consteval auto operator+(TypesPack<Concats...>) const
@@ -188,7 +197,7 @@ public:
 	{
 		return push_back(TypesPack<Pushes...>());
 	}
-	
+
 	consteval static auto reverse()
 	{
 		return TypesPackDetails::reverse(TypesPack<>(), TypesPack<Types...>());

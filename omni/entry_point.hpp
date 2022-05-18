@@ -14,8 +14,6 @@ bool on_key_up(Omni::Win::KeyUpEvent* key_up_event)
 
 int wmain(/**int argc, wchar_t** argv**/)
 {
-	using namespace SA;
-
 	Omni::init();
 
 	Omni::Win::WindowResources wnd_resources;
