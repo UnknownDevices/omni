@@ -6,7 +6,7 @@
 #include <omni/core.hpp>
 #include <omni/win/incl_windows.h>
 
-namespace Omni::Win
+namespace Omni
 {
     class OMNI_API WindowResources
     {
@@ -16,8 +16,8 @@ namespace Omni::Win
 
         static void increment(std::string& str, size_t begin_i = 0, bool allow_resize = true);
 
-        void create();
-        void destroy();
+        void start();
+        void stop();
 
         ATOM get_atom() const
         {

@@ -22,15 +22,20 @@
 
 namespace Omni
 {
-	template <typename T> 
+	template <typename T>
 	class Delegate;
 
-	template <typename T> 
+	template <typename T>
 	class MulticastDelegate;
 
 	template<typename TRet, typename ... TParams>
-	class Delegate<TRet(TParams...)> final : private DelegateBase<TRet(TParams...)> {
+	class Delegate<TRet(TParams...)> final : private DelegateBase<TRet(TParams...)>
+	{
 	public:
+		using FunctionPtr = TRet(*)(TParams...);
+		using Ret         = TRet;
+		using Params      = ArgsPack<TParams...>;
+
 		friend class MulticastDelegate<TRet(TParams...)>;
 
 		Delegate() = default;
@@ -94,34 +99,43 @@ namespace Omni
 			return other != (*this);
 		}
 
-		template <TRet(*TMethod)(TParams...)>
-		static Delegate create()
+		template <auto TInvokable>
+		friend auto delegate_from();
+
+		template <auto TInvokable, typename TOwner>
+		friend auto delegate_from(TOwner* owner);
+
+		template <auto TInvokable, typename TOwner>
+		friend auto delegate_from(const TOwner* owner);
+
+		template <TRet(*TFunction)(TParams...)>
+		static Delegate from()
 		{
-			return Delegate(nullptr, function_stub<TMethod>);
+			return Delegate(nullptr, function_stub<TFunction>);
 		}
 
-		template <class T, TRet(T::*Method)(TParams...)>
-		static Delegate create(T* owner)
+		template <class TOwner, TRet(TOwner::*TMethod)(TParams...)>
+		static Delegate from(TOwner* owner)
 		{
-			return Delegate(owner, method_stub<T, Method>);
+			return Delegate(owner, method_stub<TOwner, TMethod>);
 		}
 
-		template <class T, TRet(T::*Method)(TParams...) const>
-		static Delegate create(T const* owner)
+		template <class TOwner, TRet(TOwner::*TMethod)(TParams...) const>
+		static Delegate from(const TOwner* owner)
 		{
-			return Delegate(const_cast<T*>(owner), const_method_stub<T, Method>);
+			return Delegate(const_cast<TOwner*>(owner), const_method_stub<TOwner, TMethod>);
 		}
 
 		template <typename TFunctor>
-		static Delegate create(const TFunctor* functor)
+		static Delegate from(const TFunctor* functor) 
 		{
 			return Delegate(const_cast<TFunctor*>(functor), 
 				const_method_stub<TFunctor, &TFunctor::operator()>);
 		}
 
-		TRet operator()(TParams... arg) const
+		TRet operator()(TParams... params) const
 		{
-			return (*invocation.stub)(invocation.owner, arg...);
+			return (*invocation.stub)(invocation.owner, params...);
 		}
 
 	private:
@@ -143,17 +157,17 @@ namespace Omni
 			return (Function)(params...);
 		}
 
-		template <class TOwner, TRet(TOwner::*Method)(TParams...)>
+		template <class TOwner, TRet(TOwner::* Method)(TParams...)>
 		static TRet method_stub(void* owner, TParams... params)
 		{
 			TOwner* p = static_cast<TOwner*>(owner);
 			return (p->*Method)(params...);
 		}
 
-		template <class TOwner, TRet(TOwner::*Method)(TParams...) const>
+		template <class TOwner, TRet(TOwner::* Method)(TParams...) const>
 		static TRet const_method_stub(void* owner, TParams... params)
 		{
-			TOwner* const p = static_cast<TOwner*>(owner);
+			const TOwner* p = static_cast<TOwner*>(owner);
 			return (p->*Method)(params...);
 		}
 
@@ -168,66 +182,9 @@ namespace Omni
 	struct IsDelegate<Delegate<TRet(TParams...)>> : std::true_type
 	{};
 
-	template<typename Type>
-	struct IsFunctionPtr : std::false_type
-	{};
-
-	template <typename TRet, typename ... TParams>
-	struct IsFunctionPtr<TRet(*)(TParams...)> : std::true_type
-	{};
-
-	template<typename Type>
-	struct IsMethodPtr : std::false_type
-	{};
-
-	template <typename TOwner, typename TRet, typename ... TParams>
-	struct IsMethodPtr<TRet(TOwner::*)(TParams...)> : std::true_type
-	{};
-
-	template<typename Type>
-	struct IsConstMethodPtr : std::false_type
-	{};
-
-	template <typename TOwner, typename TRet, typename ... TParams>
-	struct IsConstMethodPtr<TRet(TOwner::*)(TParams...) const> : std::true_type
-	{};
+	template <typename TArgsF, typename ... TArgsT>
+	struct Instantiate<Delegate, TypesPack<TArgsF, TArgsT...>>
+	{
+		using Type = Delegate<TArgsF(TArgsT...)>; //TODO:
+	};
 }
-
-template <typename TRet, typename ... TParams>
-struct ArgsOf<Omni::Delegate<TRet(TParams...)>>
-{
-	using Template = Omni::Delegate;
-	using Args     = TypesPack<TRet, TParams...>;
-
-	using Ret      = TRet;
-	using Params   = TypesPack<TParams...>;
-};
-
-template <typename TRet, typename ... TParams>
-struct ArgsOf<TRet(*)(TParams...)>
-{
-	using Args   = TypesPack<TRet, TParams...>;
-
-	using Ret    = TRet;
-	using Params = TypesPack<TParams...>;
-};
-
-template <typename TOwner, typename TRet, typename ... TParams>
-struct ArgsOf<TRet(TOwner::*)(TParams...)>
-{
-	using Args   = TypesPack<TOwner, TRet, TParams...>;
-
-	using Owner  = TOwner;
-	using Ret    = TRet;
-	using Params = TypesPack<TParams...>;
-};
-
-template <typename TOwner, typename TRet, typename ... TParams>
-struct ArgsOf<TRet(TOwner::*)(TParams...) const>
-{
-	using Args   = TypesPack<TOwner, TRet, TParams...>;
-
-	using Owner  = TOwner;
-	using Ret    = TRet;
-	using Params = TypesPack<TParams...>;
-};

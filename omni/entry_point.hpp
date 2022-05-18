@@ -6,40 +6,46 @@
 #include <omni/win/window.hpp>
 #include <omni/utility/delegate.hpp>
 
-bool on_key_up(Omni::Win::KeyUpEvent* key_up_event)
+bool on_key_up(Omni::KeyUpEvent* key_up_event)
 {
-	Omni::debug_log("key_up_event from static fn: [{}]", *key_up_event);
+	debug_log("key_up_event from static fn: [{}]", *key_up_event);
 	return false;
 }
 
 int wmain(/**int argc, wchar_t** argv**/)
 {
-	Omni::init();
+	using namespace Omni;
 
-	Omni::Win::WindowResources wnd_resources;
-	wnd_resources.create();
-	Omni::Win::Window wnd;
-	wnd.create(wnd_resources);
+	init();
+
+	auto wnd_resources = WindowResources();
+	wnd_resources.start();
+	auto wnd = Window();
+	wnd.start(wnd_resources);
 
 //----TESTING--------------------------------------------------------------------------------------
-	auto app = Omni::App();
-	auto on_key_down = [](Omni::Win::KeyDownEvent* key_down_event) -> bool
+	using TP1 = TypesPack<uint8, uint16, uint32, uint64, int8, int16, int32, int64>;
+	using TP2 = SubPack<TP1, 2, 4>;
+	using X   = Unpack<TP2, 0>;
+	using Y   = Unpack<TP2, 3>;
+
+	const auto app = App();
+	auto on_key_down = [](KeyDownEvent* key_down_event) -> bool
 	{
-		Omni::debug_log("key_down_event from lambda: [{}]", *key_down_event);
+		debug_log("key_down_event from lambda: [{}]", *key_down_event);
 		return false;
 	};
 
-	wnd.add_callback<&Omni::App::on_button_down>(&app);
-	wnd.add_callback<&Omni::App::on_button_up>(&app);
-	wnd.add_callback(&on_key_down);
-	wnd.add_callback<&on_key_up>();
+	wnd.add_callback(Window::ButtonDownDelegate::from<App, &App::on_button_down>(&app));
+	wnd.add_callback(Window::ButtonUpDelegate::from<App, &App::on_button_up>(&app));
+	wnd.add_callback(Window::KeyDownDelegate::from(&on_key_down));
+	wnd.add_callback(Window::KeyUpDelegate::from<&on_key_up>());
 //-------------------------------------------------------------------------------------------------
 
-	while (Omni::Win::Window::poll_msg());
+	while (Window::poll_msg());
 
-	wnd_resources.destroy();
+	wnd_resources.stop();
 
-	int ret = 0;
-	Omni::trace_log("Returning with code: [{}].", ret);
+	trace_log("Main return successfully.");
 	return 0;
 }

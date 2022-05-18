@@ -10,7 +10,7 @@
 
 #define OMNI_WINAPI_MAX_STR 256
 
-namespace Omni::Win
+namespace Omni
 {
     inline const char* format_win32_error(DWORD error)
     {

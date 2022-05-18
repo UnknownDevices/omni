@@ -26,7 +26,7 @@ namespace Omni
 	class DelegateBase<TRet(TParams...)>
 	{
 	protected:
-		using stub_type = TRet(*)(void* owner, TParams...);
+		using stub_type = TRet(*)(void*, TParams...);
 
 		struct InvocationElement
 		{

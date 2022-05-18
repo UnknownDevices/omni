@@ -4,7 +4,7 @@
 #include <omni/logger.hpp>
 #include <omni/utility/types_pack.hpp>
 
-namespace Omni::Win
+namespace Omni
 {
     Window& Window::get_user_data(HWND hwnd)
     {
@@ -13,12 +13,15 @@ namespace Omni::Win
 
     LRESULT CALLBACK Window::proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM wparam, LPARAM lparam)
     {
+        auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
+        auto& u_lparam = *reinterpret_cast<uint64*>(&lparam);
+
         switch (msg_type)
         {
             case WM_DESTROY:
             {
                 auto& wnd = *reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-                wnd.destroy();
+                wnd.stop();
                 return 0;
             }
             case WM_PAINT:
@@ -71,17 +74,45 @@ namespace Omni::Win
             }
             case WM_KEYDOWN:
             {
-                Window::pv_proc_key_down_msg(hwnd, wparam, lparam);
+                auto key_down_event = KeyDownEvent(
+                    static_cast<uint16>(u_wparam),
+                    static_cast<uint16>(get_bit_range(u_lparam, 16, 24)),
+                    static_cast<uint16>(get_bit_range(u_lparam, 0 , 16)),
+                    static_cast<uint8> (get_bit_range(u_lparam, 30, 31)),
+                    static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
+
+                for (auto callback : Window::get_user_data(hwnd).key_down_callbacks_)
+                {
+                    if (callback(&key_down_event))
+                        break;
+                }
                 break;
             }
             case WM_KEYUP:
             {
-                Window::pv_proc_key_up_msg(hwnd, wparam, lparam);
+                auto key_up_event = KeyUpEvent(
+                    static_cast<uint16>(u_wparam),
+                    static_cast<uint16>(get_bit_range(u_lparam, 16, 24)),
+                    static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
+
+                for (auto callback : Window::get_user_data(hwnd).key_up_callbacks_)
+                {
+                    if (callback(&key_up_event)) 
+                        break;
+                }
                 break;
             }
             case WM_CHAR:
             {
-                Window::pv_proc_char_msg(hwnd, wparam, lparam);
+                auto char_event = CharEvent(
+                    static_cast<char> (wparam),
+                    static_cast<uint8>(get_bit_range(u_lparam, 30, 31))); 
+
+                for (auto callback : Window::get_user_data(hwnd).char_callbacks_)
+                {
+                    if (callback(&char_event)) 
+                        break;
+                }
                 break;
             }
             case WM_MENUCHAR:
@@ -127,7 +158,7 @@ namespace Omni::Win
         return true;
     }
 
-    void Window::create(WindowResources& wnd_resources, const char* title, int x, int y, 
+    void Window::start(WindowResources& wnd_resources, const char* title, int x, int y, 
         int width, int height, DWORD style)
     {
         RECT size;
@@ -147,14 +178,14 @@ namespace Omni::Win
         omni_assert_win32_call(success, ShowWindowAsync);
     }
 
-    void Window::destroy()
+    void Window::stop()
     {
         bool success = DestroyWindow(hwnd_);
         omni_assert_win32_call(success, DestroyWindow);
         PostQuitMessage(0);
     }
 
-    bool Window::pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
+    void Window::pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
     {
         auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
 
@@ -166,13 +197,11 @@ namespace Omni::Win
         for (auto callback : Window::get_user_data(hwnd).button_up_callbacks_)
         {
             if (callback(&button_up_event)) 
-                return true;
+                break;
         }
-
-        return false;
     }
 
-    bool Window::pv_proc_button_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
+    void Window::pv_proc_button_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
     {
         auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
 
@@ -184,68 +213,7 @@ namespace Omni::Win
         for (auto callback : Window::get_user_data(hwnd).button_down_callbacks_)
         {
             if (callback(&button_down_event)) 
-                return true;
+                break;
         }
-
-        return false;
     }
-    
-    bool Window::pv_proc_key_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
-    {
-        auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
-        auto& u_lparam = *reinterpret_cast<uint64*>(&lparam);
-
-        // TODO: Win32 may provide methods to access these data
-        auto key_down_event = KeyDownEvent(
-            static_cast<uint16>(u_wparam),
-            static_cast<uint16>(get_bit_range(u_lparam, 16, 24)),
-            static_cast<uint16>(get_bit_range(u_lparam, 0 , 16)),
-            static_cast<uint8> (get_bit_range(u_lparam, 30, 31)),
-            static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
-
-        for (auto callback : Window::get_user_data(hwnd).key_down_callbacks_)
-        {
-            if (callback(&key_down_event)) 
-                return true;
-        }
-
-        return false;
-    }
-    
-    bool Window::pv_proc_key_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
-    {
-        auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
-        auto& u_lparam = *reinterpret_cast<uint64*>(&lparam);
-
-        auto key_up_event = KeyUpEvent(
-            static_cast<uint16>(u_wparam),
-            static_cast<uint16>(get_bit_range(u_lparam, 16, 24)),
-            static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
-
-        for (auto callback : Window::get_user_data(hwnd).key_up_callbacks_)
-        {
-            if (callback(&key_up_event)) 
-                return true;
-        }
-
-        return false;
-    }
-    
-    bool Window::pv_proc_char_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
-    {
-        auto& u_lparam = *reinterpret_cast<uint64*>(&lparam);
-
-        auto char_event = CharEvent(
-            static_cast<char> (wparam),
-            static_cast<uint8>(get_bit_range(u_lparam, 30, 31))); 
-
-        for (auto callback : Window::get_user_data(hwnd).char_callbacks_)
-        {
-            if (callback(&char_event)) 
-                return true;
-        }
-
-        return false;
-    }
-
 }

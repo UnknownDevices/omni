@@ -75,24 +75,24 @@ namespace Omni
 
     constexpr auto make_bit_flag(auto x) noexcept
     {
-        return 1U << x >> 1U;
+        return 1U << x;
     }
 
-    constexpr uint8_fast* as_byte_arr(auto* x) noexcept
+    constexpr uint8* as_byte_arr(auto* x) noexcept
     {
         return static_cast<char*>(static_cast<void*>(&x));
     }
 
-    constexpr uint8_fast* as_byte_arr(const auto* x) noexcept
+    constexpr uint8* as_byte_arr(const auto* x) noexcept
     {
         return static_cast<char*>(static_cast<void*>(&x));
     }
 
     template<typename TSource>
-    constexpr TSource get_bit_range(TSource source, auto incl_begin, auto excl_end) noexcept
+    constexpr TSource get_bit_range(TSource source, auto begin, auto end) noexcept
     {
-        TSource mask = ~(~TSource(0) << (excl_end - incl_begin));
-        return (source >> incl_begin) & mask;
+        TSource mask = ~(~TSource(0) << (end - begin));
+        return (source >> begin) & mask;
     }
 
     void OMNI_API init();

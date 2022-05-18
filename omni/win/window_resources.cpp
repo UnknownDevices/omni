@@ -4,7 +4,7 @@
 #include <omni/win/window.hpp>
 #include <omni/logger.hpp>
 
-namespace Omni::Win
+namespace Omni
 {
     void WindowResources::increment(std::string& str, size_t begin_i, bool allow_resize)
     {
@@ -29,7 +29,7 @@ namespace Omni::Win
         }
     }
 
-    void WindowResources::create()
+    void WindowResources::start()
     {
         increment(s_class_name, 5);
         
@@ -52,7 +52,7 @@ namespace Omni::Win
         omni_assert_win32_call(atom_, RegisterClassEx);
     }
 
-    void WindowResources::destroy() 
+    void WindowResources::stop() 
     {
         bool success = UnregisterClass((LPCSTR)atom_, omni_hinst);
         omni_assert_win32_call(success, UnregisterClass);

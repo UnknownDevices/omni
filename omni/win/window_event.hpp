@@ -4,7 +4,7 @@
 #include <omni/core.hpp>
 #include <omni/logger.hpp>
 
-namespace Omni::Win
+namespace Omni
 {
     class WindowEvent
     {
@@ -167,7 +167,7 @@ namespace Omni::Win
 }
 
 template<>
-struct fmt::formatter<Omni::Win::ButtonDownEvent>
+struct fmt::formatter<Omni::ButtonDownEvent>
 {
     template<typename ParseContext>
     constexpr auto parse(ParseContext& ctx)
@@ -176,7 +176,7 @@ struct fmt::formatter<Omni::Win::ButtonDownEvent>
     }
 
     template<typename FormatContext>
-    auto format(const Omni::Win::ButtonDownEvent& button_down, FormatContext& ctx)
+    auto format(const Omni::ButtonDownEvent& button_down, FormatContext& ctx)
     { 
         return fmt::format_to(ctx.out(),
             "x: [{:d}] "
@@ -189,7 +189,7 @@ struct fmt::formatter<Omni::Win::ButtonDownEvent>
 };
 
 template<>
-struct fmt::formatter<Omni::Win::ButtonUpEvent>
+struct fmt::formatter<Omni::ButtonUpEvent>
 {
     template<typename ParseContext>
     constexpr auto parse(ParseContext& ctx)
@@ -198,7 +198,7 @@ struct fmt::formatter<Omni::Win::ButtonUpEvent>
     }
 
     template<typename FormatContext>
-    auto format(const Omni::Win::ButtonUpEvent& button_up, FormatContext& ctx)
+    auto format(const Omni::ButtonUpEvent& button_up, FormatContext& ctx)
     { 
         return fmt::format_to(ctx.out(),
             "x: [{:d}] "
@@ -211,7 +211,7 @@ struct fmt::formatter<Omni::Win::ButtonUpEvent>
 };
 
 template<>
-struct fmt::formatter<Omni::Win::KeyDownEvent>
+struct fmt::formatter<Omni::KeyDownEvent>
 {
     template<typename ParseContext>
     constexpr auto parse(ParseContext& ctx)
@@ -220,7 +220,7 @@ struct fmt::formatter<Omni::Win::KeyDownEvent>
     }
 
     template<typename FormatContext>
-    auto format(const Omni::Win::KeyDownEvent& key_down, FormatContext& ctx)
+    auto format(const Omni::KeyDownEvent& key_down, FormatContext& ctx)
     { 
         return fmt::format_to(ctx.out(), 
             "key_code: [{:03d}] "
@@ -237,7 +237,7 @@ struct fmt::formatter<Omni::Win::KeyDownEvent>
 };
 
 template<>
-struct fmt::formatter<Omni::Win::KeyUpEvent>
+struct fmt::formatter<Omni::KeyUpEvent>
 {
     template<typename ParseContext>
     constexpr auto parse(ParseContext& ctx)
@@ -246,7 +246,7 @@ struct fmt::formatter<Omni::Win::KeyUpEvent>
     }
 
     template<typename FormatContext>
-    auto format(const Omni::Win::KeyUpEvent& key_up, FormatContext& ctx)
+    auto format(const Omni::KeyUpEvent& key_up, FormatContext& ctx)
     { 
         return fmt::format_to(ctx.out(), 
             "key_code: [{:03d}] "
@@ -259,7 +259,7 @@ struct fmt::formatter<Omni::Win::KeyUpEvent>
 };
 
 template<>
-struct fmt::formatter<Omni::Win::CharEvent>
+struct fmt::formatter<Omni::CharEvent>
 {
     template<typename ParseContext>
     constexpr auto parse(ParseContext& ctx)
@@ -268,7 +268,7 @@ struct fmt::formatter<Omni::Win::CharEvent>
     }
 
     template<typename FormatContext>
-    auto format(const Omni::Win::CharEvent& key_up, FormatContext& ctx)
+    auto format(const Omni::CharEvent& key_up, FormatContext& ctx)
     { 
         return fmt::format_to(ctx.out(), 
             "character_code: [{:03d}] "
