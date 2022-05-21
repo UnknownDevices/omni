@@ -6,14 +6,7 @@
 
 namespace Omni
 {
-    class WindowEvent
-    {
-    protected:
-        OMNI_CONSTEXPR WindowEvent() noexcept = default;
-        OMNI_CONSTEXPR ~WindowEvent() noexcept = default;
-    };
-
-    class ButtonDownEvent : public WindowEvent
+    class ButtonDownEvent
     {
     public:
         constexpr ButtonDownEvent(int16 x, int16 y, uint8 mods) noexcept :
@@ -42,7 +35,7 @@ namespace Omni
         uint8 mods_;
     };
 
-    class ButtonUpEvent : public WindowEvent
+    class ButtonUpEvent
     {
     public:
         constexpr ButtonUpEvent(int16 x, int16 y, uint8 mods) noexcept :
@@ -71,7 +64,7 @@ namespace Omni
         uint8 mods_;
     };
 
-    class KeyDownEvent : public WindowEvent
+    class KeyDownEvent
     {
     public:
         constexpr KeyDownEvent(uint16 key_code, uint16 scan_code, uint16 repeat_count, 
@@ -113,7 +106,7 @@ namespace Omni
         uint8 is_hold_, is_extended_key_;
     };
 
-    class KeyUpEvent : public WindowEvent
+    class KeyUpEvent
     {
     public:
         constexpr KeyUpEvent(uint16 key_code, uint16 scan_code, uint8 is_extended_key) noexcept :
@@ -142,7 +135,7 @@ namespace Omni
         uint8 is_extended_key_;
     };
 
-    class CharEvent : public WindowEvent
+    class CharEvent
     {
     public:
         constexpr CharEvent(char character_code, uint8 is_hold) noexcept :

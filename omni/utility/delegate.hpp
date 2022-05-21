@@ -185,6 +185,6 @@ namespace Omni
 	template <typename TArgsF, typename ... TArgsT>
 	struct Instantiate<Delegate, TypesPack<TArgsF, TArgsT...>>
 	{
-		using Type = Delegate<TArgsF(TArgsT...)>; //TODO:
+		using Type = Delegate<TArgsF(TArgsT...)>;
 	};
 }

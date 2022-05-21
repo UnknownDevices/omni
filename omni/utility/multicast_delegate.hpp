@@ -85,12 +85,12 @@ namespace Omni
 
 		MulticastDelegate& operator+=(const MulticastDelegate& other)
 		{
-			for (auto& elem : other.invocations) // clone, not copy; flattens hierarchy:
+			for (auto& elem : other.invocations)
 				this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(elem->owner, elem->stub));
 			return *this;
 		}
 
-		template <typename LAMBDA> // template instantiation is not neededm, will be deduced/inferred:
+		template <typename LAMBDA>
 		MulticastDelegate& operator+=(const LAMBDA& lambda)
 		{
 			Delegate<TRet(TParams...)> d = Delegate<TRet(TParams...)>::template create<LAMBDA>(lambda);
@@ -104,8 +104,6 @@ namespace Omni
 			return *this;
 		}
 
-		// will work even if RET is void, return values are ignored:
-		// (for handling return values, see operator(..., handler))
 		void operator()(TParams... params) const
 		{
 			for (auto& elem : invocations)

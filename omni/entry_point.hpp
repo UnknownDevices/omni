@@ -25,11 +25,6 @@ int wmain(/**int argc, wchar_t** argv**/)
 	wnd.start(wnd_resources);
 
 //----TESTING--------------------------------------------------------------------------------------
-	using TP1 = TypesPack<uint8, uint16, uint32, uint64, int8, int16, int32, int64>;
-	using TP2 = SubPack<TP1, 2, 4>;
-	using X   = Unpack<TP2, 0>;
-	using Y   = Unpack<TP2, 3>;
-
 	const auto app = App();
 	
 	auto on_key_down = [](KeyDownEvent* key_down_event) -> bool
