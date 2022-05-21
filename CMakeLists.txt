@@ -99,6 +99,7 @@ target_precompile_headers(omni
     <format>
     <streambuf>
     <limits.h>
+    <forward_list>
     <set>
     <map>
     <unordered_set>

@@ -34,42 +34,42 @@ namespace Omni
             }
             case WM_LBUTTONDOWN:
             {
-                Window::pv_proc_button_down_msg(hwnd, wparam, lparam);
+                pv_proc_button_down_msg(hwnd, wparam, lparam);
                 return 0;
             }
             case WM_RBUTTONDOWN:
             {
-                Window::pv_proc_button_down_msg(hwnd, wparam, lparam);
+                pv_proc_button_down_msg(hwnd, wparam, lparam);
                 return 0;
             }
             case WM_MBUTTONDOWN:
             {
-                Window::pv_proc_button_down_msg(hwnd, wparam, lparam);
+                pv_proc_button_down_msg(hwnd, wparam, lparam);
                 return 0;
             }
             case WM_XBUTTONDOWN:
             {
-                Window::pv_proc_button_down_msg(hwnd, wparam, lparam);
+                pv_proc_button_down_msg(hwnd, wparam, lparam);
                 return 0;
             }
             case WM_LBUTTONUP:
             {
-                Window::pv_proc_button_up_msg(hwnd, wparam, lparam);
+                pv_proc_button_up_msg(hwnd, wparam, lparam);
                 return 0;
             }
             case WM_RBUTTONUP:
             {
-                Window::pv_proc_button_up_msg(hwnd, wparam, lparam);
+                pv_proc_button_up_msg(hwnd, wparam, lparam);
                 return 0;
             }
             case WM_MBUTTONUP:
             {
-                Window::pv_proc_button_up_msg(hwnd, wparam, lparam);
+                pv_proc_button_up_msg(hwnd, wparam, lparam);
                 return 0;
             }
             case WM_XBUTTONUP:
             {
-                Window::pv_proc_button_up_msg(hwnd, wparam, lparam);
+                pv_proc_button_up_msg(hwnd, wparam, lparam);
                 return 0;
             }
             case WM_KEYDOWN:
@@ -81,12 +81,8 @@ namespace Omni
                     static_cast<uint8> (get_bit_range(u_lparam, 30, 31)),
                     static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
 
-                for (auto callback : Window::get_user_data(hwnd).key_down_callbacks_)
-                {
-                    if (callback(&key_down_event))
-                        break;
-                }
-                break;
+                get_user_data(hwnd).key_down_callbacks_(&key_down_event, &pv_handle_callback_ret);
+                return 0;
             }
             case WM_KEYUP:
             {
@@ -95,12 +91,8 @@ namespace Omni
                     static_cast<uint16>(get_bit_range(u_lparam, 16, 24)),
                     static_cast<uint8> (get_bit_range(u_lparam, 24, 25)));
 
-                for (auto callback : Window::get_user_data(hwnd).key_up_callbacks_)
-                {
-                    if (callback(&key_up_event)) 
-                        break;
-                }
-                break;
+                get_user_data(hwnd).key_up_callbacks_(&key_up_event, &pv_handle_callback_ret);
+                return 0;
             }
             case WM_CHAR:
             {
@@ -108,12 +100,8 @@ namespace Omni
                     static_cast<char> (wparam),
                     static_cast<uint8>(get_bit_range(u_lparam, 30, 31))); 
 
-                for (auto callback : Window::get_user_data(hwnd).char_callbacks_)
-                {
-                    if (callback(&char_event)) 
-                        break;
-                }
-                break;
+                get_user_data(hwnd).char_callbacks_(&char_event, &pv_handle_callback_ret);
+                return 0;
             }
             case WM_MENUCHAR:
             {
@@ -185,20 +173,9 @@ namespace Omni
         PostQuitMessage(0);
     }
 
-    void Window::pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
+    bool Window::pv_handle_callback_ret(size_t, bool e_handled) noexcept
     {
-        auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
-
-        auto button_up_event = ButtonUpEvent(
-            *(reinterpret_cast<int16*>(&lparam)),
-            *(reinterpret_cast<int16*>(&lparam) + 1),
-            *(reinterpret_cast<uint8*>(&u_wparam)));
-
-        for (auto callback : Window::get_user_data(hwnd).button_up_callbacks_)
-        {
-            if (callback(&button_up_event)) 
-                break;
-        }
+        return !e_handled;
     }
 
     void Window::pv_proc_button_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
@@ -210,10 +187,18 @@ namespace Omni
             *(reinterpret_cast<int16*>(&lparam) + 1),
             *(reinterpret_cast<uint8*>(&u_wparam)));
 
-        for (auto callback : Window::get_user_data(hwnd).button_down_callbacks_)
-        {
-            if (callback(&button_down_event)) 
-                break;
-        }
+        get_user_data(hwnd).button_down_callbacks_(&button_down_event, &pv_handle_callback_ret);
+    }
+
+    void Window::pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam)
+    {
+        auto& u_wparam = *reinterpret_cast<uint64*>(&wparam);
+
+        auto button_up_event = ButtonUpEvent(
+            *(reinterpret_cast<int16*>(&lparam)),
+            *(reinterpret_cast<int16*>(&lparam) + 1),
+            *(reinterpret_cast<uint8*>(&u_wparam)));
+
+        get_user_data(hwnd).button_up_callbacks_(&button_up_event, &pv_handle_callback_ret);
     }
 }

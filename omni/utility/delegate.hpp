@@ -34,7 +34,7 @@ namespace Omni
 	public:
 		using FunctionPtr = TRet(*)(TParams...);
 		using Ret         = TRet;
-		using Params      = ArgsPack<TParams...>;
+		using Params      = TypesPack<TParams...>;
 
 		friend class MulticastDelegate<TRet(TParams...)>;
 

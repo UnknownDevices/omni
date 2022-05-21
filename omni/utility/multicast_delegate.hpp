@@ -25,109 +25,118 @@ namespace Omni
 	{
 	public:
 		constexpr MulticastDelegate() = default;
+		MulticastDelegate(const MulticastDelegate&) = delete;
 
 		~MulticastDelegate()
 		{
-			for (auto& element : invocationList) delete element;
-			invocationList.clear();
+			for (auto& elem : invocations) 
+				delete elem;
+			
+			invocations.clear();
 		}
 
 		bool is_null() const
 		{
-			return invocationList.size() < 1;
+			return invocations.size() < 1;
 		}
-		bool operator ==(void* ptr) const
+
+		bool operator==(void* ptr) const
 		{
 			return (ptr == nullptr) && this->is_null();
-		} //operator ==
-		bool operator !=(void* ptr) const
+		}
+
+		bool operator!=(void* ptr) const
 		{
 			return (ptr != nullptr) || (!this->is_null());
-		} //operator !=
+		}
 
 		size_t size() const
 		{
-			return invocationList.size();
+			return invocations.size();
 		}
 
-		MulticastDelegate& operator =(const MulticastDelegate&) = delete;
-		MulticastDelegate(const MulticastDelegate&) = delete;
+		MulticastDelegate& operator=(const MulticastDelegate&) = delete;
 
-		bool operator ==(const MulticastDelegate& another) const
+		bool operator==(const MulticastDelegate& other) const
 		{
-			if (invocationList.size() != another.invocationList.size()) return false;
-			auto anotherIt = another.invocationList.begin();
-			for (auto it = invocationList.begin(); it != invocationList.end(); ++it)
-				if (**it != **anotherIt) return false;
+			if (invocations.size() != other.invocations.size()) return false;
+			auto otherIt = other.invocations.begin();
+			for (auto it = invocations.begin(); it != invocations.end(); ++it)
+				if (**it != **otherIt) return false;
 			return true;
-		} //==
-		bool operator !=(const MulticastDelegate& another) const
-		{
-			return !(*this == another);
 		}
 
-		bool operator ==(const Delegate<TRet(TParams...)>& another) const
+		bool operator!=(const MulticastDelegate& other) const
 		{
-			if (is_null() && another.is_null()) return true;
-			if (another.is_null() || (size() != 1)) return false;
-			return (another.invocation == **invocationList.begin());
-		} //==
-		bool operator !=(const Delegate<TRet(TParams...)>& another) const
-		{
-			return !(*this == another);
+			return !(*this == other);
 		}
 
-		MulticastDelegate& operator +=(const MulticastDelegate& another)
+		bool operator==(const Delegate<TRet(TParams...)>& other) const
 		{
-			for (auto& item : another.invocationList) // clone, not copy; flattens hierarchy:
-				this->invocationList.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(item->owner, item->stub));
+			if (is_null() && other.is_null()) return true;
+			if (other.is_null() || (size() != 1)) return false;
+			return (other.invocation == **invocations.begin());
+		}
+
+		bool operator!=(const Delegate<TRet(TParams...)>& other) const
+		{
+			return !(*this == other);
+		}
+
+		MulticastDelegate& operator+=(const MulticastDelegate& other)
+		{
+			for (auto& elem : other.invocations) // clone, not copy; flattens hierarchy:
+				this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(elem->owner, elem->stub));
 			return *this;
-		} //operator +=
+		}
 
 		template <typename LAMBDA> // template instantiation is not neededm, will be deduced/inferred:
-		MulticastDelegate& operator +=(const LAMBDA& lambda)
+		MulticastDelegate& operator+=(const LAMBDA& lambda)
 		{
 			Delegate<TRet(TParams...)> d = Delegate<TRet(TParams...)>::template create<LAMBDA>(lambda);
 			return *this += d;
-		} //operator +=
+		}
 
-		MulticastDelegate& operator +=(const Delegate<TRet(TParams...)>& another)
+		MulticastDelegate& operator+=(const Delegate<TRet(TParams...)>& other)
 		{
-			if (another.is_null()) return *this;
-			this->invocationList.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(another.invocation.owner, another.invocation.stub));
+			if (other.is_null()) return *this;
+			this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(other.invocation.owner, other.invocation.stub));
 			return *this;
-		} //operator +=
+		}
 
 		// will work even if RET is void, return values are ignored:
 		// (for handling return values, see operator(..., handler))
 		void operator()(TParams... params) const
 		{
-			for (auto& item : invocationList)
-				(*(item->stub))(item->owner, params...);
-		} //operator()
+			for (auto& elem : invocations)
+				(*(elem->stub))(elem->owner, params...);
+		}
 
-		template<typename HANDLER>
-		void operator()(TParams... params, HANDLER) const
+		template<typename THandler>
+		void operator()(TParams... params, THandler handler) const
 		{
 			size_t index = 0;
-			for (auto& item : invocationList)
+			for (auto& elem : invocations)
 			{
-				TRet value = (*(item->stub))(item->owner, params...);
-				handler(index, &value);
-				++index;
-			} //loop
-		} //operator()
+				TRet inv_ret = (*(elem->stub))(elem->owner, params...);
+				if (!handler(index, inv_ret))
+					break;
 
-		void operator()(TParams... params, Delegate<void(size_t, TRet*)> handler) const
+				++index;
+			}
+		}
+
+		void operator()(TParams... params, Delegate<bool(size_t, TRet)> handler) const
 		{
 			operator()<decltype(handler)>(params..., handler);
-		} //operator()
-		void operator()(TParams... params, std::function<void(size_t, TRet*)> handler) const
+		}
+
+		void operator()(TParams... params, std::function<bool(size_t, TRet)> handler) const
 		{
 			operator()<decltype(handler)>(params..., handler);
-		} //operator()
+		}
 
 	private:
-		std::list<typename DelegateBase<TRet(TParams...)>::InvocationElement*> invocationList;
-	}; //class MulticastDelegate
-} /* namespace SA */
+		std::vector<typename DelegateBase<TRet(TParams...)>::InvocationElement*> invocations;
+	};
+}

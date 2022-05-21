@@ -20,7 +20,8 @@ int wmain(/**int argc, wchar_t** argv**/)
 
 	auto wnd_resources = WindowResources();
 	wnd_resources.start();
-	auto wnd = Window();
+
+	auto wnd = Window();	
 	wnd.start(wnd_resources);
 
 //----TESTING--------------------------------------------------------------------------------------
@@ -30,12 +31,14 @@ int wmain(/**int argc, wchar_t** argv**/)
 	using Y   = Unpack<TP2, 3>;
 
 	const auto app = App();
+	
 	auto on_key_down = [](KeyDownEvent* key_down_event) -> bool
 	{
 		debug_log("key_down_event from lambda: [{}]", *key_down_event);
 		return false;
 	};
 
+	wnd.add_callback(Window::ButtonDownDelegate::from<App, &App::on_button_down>(&app));
 	wnd.add_callback(Window::ButtonDownDelegate::from<App, &App::on_button_down>(&app));
 	wnd.add_callback(Window::ButtonUpDelegate::from<App, &App::on_button_up>(&app));
 	wnd.add_callback(Window::KeyDownDelegate::from(&on_key_down));

@@ -4,7 +4,7 @@
 #include <omni/win/incl_windows.h>
 #include <omni/win/window_resources.hpp>
 #include <omni/win/window_event.hpp>
-#include <omni/utility/delegate.hpp>
+#include <omni/utility/multicast_delegate.hpp>
 
 namespace Omni
 {
@@ -21,6 +21,7 @@ namespace Omni
 
         OMNI_CONSTEXPR Window() noexcept = default;
         OMNI_CONSTEXPR ~Window() noexcept = default;
+
 
         static Window& get_user_data(HWND hwnd);
 
@@ -43,13 +44,14 @@ namespace Omni
         template <typename TDelegate>
         void add_callback(TDelegate callback)
         {
-            using WindowEventSubtype = UnpackArg<TDelegate::Params, 0>;
+            using WindowEventSubtype = Unpack<TDelegate::Params, 0>;
             auto& callbacks = pv_deduce_callbacks<WindowEventSubtype>();
 
-            callbacks.push_back(callback);
+            callbacks += callback;
         }
 
     private:
+        static bool pv_handle_callback_ret(size_t, bool e_handled) noexcept;
         static void pv_proc_button_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
         static void pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
         
@@ -73,10 +75,11 @@ namespace Omni
         }
 
         HWND hwnd_;
-        std::vector<ButtonDownDelegate> button_down_callbacks_;
-        std::vector<ButtonUpDelegate> button_up_callbacks_;
-        std::vector<KeyDownDelegate> key_down_callbacks_;
-        std::vector<KeyUpDelegate> key_up_callbacks_;
-        std::vector<CharDelegate> char_callbacks_;
+        MulticastDelegate<bool(ButtonDownEvent*)> button_down_callbacks_;
+        MulticastDelegate<bool(ButtonUpEvent*)> button_up_callbacks_;
+        MulticastDelegate<bool(KeyDownEvent*)> key_down_callbacks_;
+        MulticastDelegate<bool(KeyUpEvent*)> key_up_callbacks_;
+        MulticastDelegate<bool(CharEvent*)> char_callbacks_;
     };
+
 }
