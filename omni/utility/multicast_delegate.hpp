@@ -24,6 +24,8 @@ namespace Omni
 	class MulticastDelegate<TRet(TParams...)> final : private DelegateBase<TRet(TParams...)>
 	{
 	public:
+		using Value = Delegate<TRet(TParams...)>;
+
 		constexpr MulticastDelegate() = default;
 		MulticastDelegate(const MulticastDelegate&) = delete;
 
@@ -90,13 +92,6 @@ namespace Omni
 			return *this;
 		}
 
-		template <typename LAMBDA>
-		MulticastDelegate& operator+=(const LAMBDA& lambda)
-		{
-			Delegate<TRet(TParams...)> d = Delegate<TRet(TParams...)>::template create<LAMBDA>(lambda);
-			return *this += d;
-		}
-
 		MulticastDelegate& operator+=(const Delegate<TRet(TParams...)>& other)
 		{
 			if (other.is_null()) return *this;
@@ -132,6 +127,44 @@ namespace Omni
 		void operator()(TParams... params, std::function<bool(size_t, TRet)> handler) const
 		{
 			operator()<decltype(handler)>(params..., handler);
+		}
+
+		void add(const MulticastDelegate& other)
+		{
+			for (auto& elem : other.invocations)
+				this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(elem->owner, elem->stub));
+		}
+
+		void add(const Delegate<TRet(TParams...)>& other)
+		{
+			if (other.is_null()) return *this;
+			this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(other.invocation.owner, other.invocation.stub));
+		}
+
+		template <TRet(*TFn)(TParams...)>
+		static void emplace()
+		{
+			Value(nullptr, Value::template function_stub<TFn>);
+		}
+
+		template <class TOwner, TRet(TOwner::*TMth)(TParams...)>
+		static void emplace(TOwner* owner)
+		{
+			Value(owner, Value::template method_stub<TOwner, TMth>);
+		}
+
+		template <class TOwner, TRet(TOwner::*TMth)(TParams...) const>
+		static void emplace(const TOwner* owner)
+		{
+			Value(const_cast<TOwner*>(owner), 
+				Value:: template const_method_stub<TOwner, TMth>);
+		}
+
+		template <typename TFunctor>
+		static void emplace(const TFunctor* functor)
+		{
+			Value(const_cast<TFunctor*>(functor),
+				Value::template onst_method_stub<TFunctor, &TFunctor::operator()>);
 		}
 
 	private:

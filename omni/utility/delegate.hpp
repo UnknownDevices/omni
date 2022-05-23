@@ -32,9 +32,16 @@ namespace Omni
 	class Delegate<TRet(TParams...)> final : private DelegateBase<TRet(TParams...)>
 	{
 	public:
-		using FunctionPtr = TRet(*)(TParams...);
+		using Args        = TypesPack<TRet, TParams...>;
+
 		using Ret         = TRet;
 		using Params      = TypesPack<TParams...>;
+
+		using Function    = TRet(*)(TParams...);
+		template <typename TOwner>
+		using Method      = TRet(TOwner::*)(TParams...);
+		template <typename TOwner> 
+		using ConstMethod = TRet(TOwner::*)(TParams...) const;
 
 		friend class MulticastDelegate<TRet(TParams...)>;
 
@@ -99,31 +106,22 @@ namespace Omni
 			return other != (*this);
 		}
 
-		template <auto TInvokable>
-		friend auto delegate_from();
-
-		template <auto TInvokable, typename TOwner>
-		friend auto delegate_from(TOwner* owner);
-
-		template <auto TInvokable, typename TOwner>
-		friend auto delegate_from(const TOwner* owner);
-
-		template <TRet(*TFunction)(TParams...)>
+		template <TRet(*TFn)(TParams...)>
 		static Delegate from()
 		{
-			return Delegate(nullptr, function_stub<TFunction>);
+			return Delegate(nullptr, function_stub<TFn>);
 		}
 
-		template <class TOwner, TRet(TOwner::*TMethod)(TParams...)>
+		template <class TOwner, TRet(TOwner::*TMth)(TParams...)>
 		static Delegate from(TOwner* owner)
 		{
-			return Delegate(owner, method_stub<TOwner, TMethod>);
+			return Delegate(owner, method_stub<TOwner, TMth>);
 		}
 
-		template <class TOwner, TRet(TOwner::*TMethod)(TParams...) const>
+		template <class TOwner, TRet(TOwner::*TMth)(TParams...) const>
 		static Delegate from(const TOwner* owner)
 		{
-			return Delegate(const_cast<TOwner*>(owner), const_method_stub<TOwner, TMethod>);
+			return Delegate(const_cast<TOwner*>(owner), const_method_stub<TOwner, TMth>);
 		}
 
 		template <typename TFunctor>
@@ -151,24 +149,24 @@ namespace Omni
 			this->invocation.stub = stub;
 		}
 
-		template <TRet(*Function)(TParams...)>
+		template <TRet(*TFn)(TParams...)>
 		static TRet function_stub(void*, TParams... params)
 		{
-			return (Function)(params...);
+			return (TFn)(params...);
 		}
 
-		template <class TOwner, TRet(TOwner::* Method)(TParams...)>
+		template <class TOwner, TRet(TOwner::*TMth)(TParams...)>
 		static TRet method_stub(void* owner, TParams... params)
 		{
 			TOwner* p = static_cast<TOwner*>(owner);
-			return (p->*Method)(params...);
+			return (p->*TMth)(params...);
 		}
 
-		template <class TOwner, TRet(TOwner::* Method)(TParams...) const>
+		template <class TOwner, TRet(TOwner::*TMth)(TParams...) const>
 		static TRet const_method_stub(void* owner, TParams... params)
 		{
 			const TOwner* p = static_cast<TOwner*>(owner);
-			return (p->*Method)(params...);
+			return (p->*TMth)(params...);
 		}
 
 		DelegateBase<TRet(TParams...)>::InvocationElement invocation;

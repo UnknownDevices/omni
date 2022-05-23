@@ -21,23 +21,23 @@ int wmain(/**int argc, wchar_t** argv**/)
 	auto wnd_resources = WindowResources();
 	wnd_resources.start();
 
-	auto wnd = Window();	
+	auto wnd = Window();
 	wnd.start(wnd_resources);
 
 //----TESTING--------------------------------------------------------------------------------------
-	const auto app = App();
-	
+	auto app = App();
+	auto button_down_event = ButtonDownEvent(1, 2, 3);
+
 	auto on_key_down = [](KeyDownEvent* key_down_event) -> bool
 	{
 		debug_log("key_down_event from lambda: [{}]", *key_down_event);
 		return false;
 	};
 
-	wnd.add_callback(Window::ButtonDownDelegate::from<App, &App::on_button_down>(&app));
-	wnd.add_callback(Window::ButtonDownDelegate::from<App, &App::on_button_down>(&app));
-	wnd.add_callback(Window::ButtonUpDelegate::from<App, &App::on_button_up>(&app));
-	wnd.add_callback(Window::KeyDownDelegate::from(&on_key_down));
-	wnd.add_callback(Window::KeyUpDelegate::from<&on_key_up>());
+	wnd.emplace_button_down_callback<App, &App::on_button_down>(&app);
+	wnd.emplace_button_up_callback<App, &App::on_button_up>(&app);
+	wnd.emplace_key_down_callback(&on_key_down);
+	wnd.emplace_key_up_callback<&on_key_up>();
 //-------------------------------------------------------------------------------------------------
 
 	while (Window::poll_msg());

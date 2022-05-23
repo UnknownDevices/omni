@@ -8,14 +8,15 @@
 
 namespace Omni
 {
+
     class OMNI_API Window
     {
     public:
-        using ButtonDownDelegate = Delegate<bool(ButtonDownEvent*)>;
-        using ButtonUpDelegate   = Delegate<bool(ButtonUpEvent*)>;
-        using KeyDownDelegate    = Delegate<bool(KeyDownEvent*)>;
-        using KeyUpDelegate      = Delegate<bool(KeyUpEvent*)>;
-        using CharDelegate       = Delegate<bool(CharEvent*)>;
+        using ButtonDownCallback = Delegate<bool(ButtonDownEvent*)>;
+        using ButtonUpCallback   = Delegate<bool(ButtonUpEvent*)>;
+        using KeyDownCallback    = Delegate<bool(KeyDownEvent*)>;
+        using KeyUpCallback      = Delegate<bool(KeyUpEvent*)>;
+        using CharCallback       = Delegate<bool(CharEvent*)>;
 
         static constexpr DWORD DefaultStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 
@@ -41,39 +42,150 @@ namespace Omni
             DWORD style = DefaultStyle);
         void stop();
 
-        template <typename TDelegate>
-        void add_callback(TDelegate callback)
+        void add_button_down_callback(ButtonDownCallback callback)
         {
-            using WindowEventSubtype = Unpack<TDelegate::Params, 0>;
-            auto& callbacks = pv_deduce_callbacks<WindowEventSubtype>();
-
-            callbacks += callback;
+            button_down_callbacks_ += callback;
         }
+
+        void add_button_up_callback(ButtonUpCallback callback)
+        {
+            button_up_callbacks_ += callback;
+        }
+
+        void add_key_down_callback(KeyDownCallback callback)
+        {
+            key_down_callbacks_ += callback;
+        }
+
+        void add_key_up_callback(KeyUpCallback callback)
+        {
+            key_up_callbacks_ += callback;
+        }
+
+        void add_char_callback(CharCallback callback)
+        {
+            char_callbacks_ += callback;
+        }
+
+		template <ButtonDownCallback::Function TFn>
+		void emplace_button_down_callback()
+		{
+			add_button_down_callback(ButtonDownCallback::from<TFn>());
+		}
+
+		template <class TOwner, ButtonDownCallback::Method<TOwner> TMth>
+		void emplace_button_down_callback(TOwner* owner)
+		{
+			add_button_down_callback(ButtonDownCallback::from<TOwner, TMth>(owner));
+		}
+
+		template <class TOwner, ButtonDownCallback::ConstMethod<TOwner> TMth>
+		void emplace_button_down_callback(const TOwner* owner)
+		{
+			add_button_down_callback(ButtonDownCallback::from<TOwner, TMth>(owner));
+		}
+
+        template <typename TFunctor>
+		void emplace_button_down_callback(const TFunctor* functor)
+		{
+			add_button_down_callback(ButtonDownCallback::from(functor));
+		}
+
+		template <ButtonUpCallback::Function TFn>
+		void emplace_button_up_callback()
+		{
+			add_button_up_callback(ButtonUpCallback::from<TFn>());
+		}
+
+		template <class TOwner, ButtonUpCallback::Method<TOwner> TMth>
+		void emplace_button_up_callback(TOwner* owner)
+		{
+			add_button_up_callback(ButtonUpCallback::from<TOwner, TMth>(owner));
+		}
+
+		template <class TOwner, ButtonUpCallback::ConstMethod<TOwner> TMth>
+		void emplace_button_up_callback(const TOwner* owner)
+		{
+			add_button_up_callback(ButtonUpCallback::from<TOwner, TMth>(owner));
+		}
+
+        template <typename TFunctor>
+		void emplace_button_up_callback(const TFunctor* functor)
+		{
+			add_button_up_callback(ButtonUpCallback::from(functor));
+		}
+
+		template <KeyDownCallback::Function TFn>
+		void emplace_key_down_callback()
+		{
+			add_key_down_callback(KeyDownCallback::from<TFn>());
+		}
+
+		template <class TOwner, KeyDownCallback::Method<TOwner> TMth>
+		void emplace_key_down_callback(TOwner* owner)
+		{
+			add_key_down_callback(KeyDownCallback::from<TOwner, TMth>(owner));
+		}
+
+		template <class TOwner, KeyDownCallback::ConstMethod<TOwner> TMth>
+		void emplace_key_down_callback(const TOwner* owner)
+		{
+			add_key_down_callback(KeyDownCallback::from<TOwner, TMth>(owner));
+		}
+
+        template <typename TFunctor>
+		void emplace_key_down_callback(const TFunctor* functor)
+		{
+			add_key_down_callback(KeyDownCallback::from(functor));
+		}
+
+		template <KeyUpCallback::Function TFn>
+		void emplace_key_up_callback()
+		{
+			add_key_up_callback(KeyUpCallback::from<TFn>());
+		}
+
+		template <class TOwner, KeyUpCallback::Method<TOwner> TMth>
+		void emplace_key_up_callback(TOwner* owner)
+		{
+			add_key_up_callback(KeyUpCallback::from<TOwner, TMth>(owner));
+		}
+
+		template <class TOwner, KeyUpCallback::ConstMethod<TOwner> TMth>
+		void emplace_key_up_callback(const TOwner* owner)
+		{
+			add_key_up_callback(KeyUpCallback::from<TOwner, TMth>(owner));
+		}
+
+		template <CharCallback::Function TFn>
+		void emplace_char_callback()
+		{
+			add_char_callback(CharCallback::from<TFn>());
+		}
+
+		template <class TOwner, CharCallback::Method<TOwner> TMth>
+		void emplace_char_callback(TOwner* owner)
+		{
+			add_char_callback(CharCallback::from<TOwner, TMth>(owner));
+		}
+
+		template <class TOwner, CharCallback::ConstMethod<TOwner> TMth>
+		void emplace_char_callback(const TOwner* owner)
+		{
+			add_char_callback(CharCallback::from<TOwner, TMth>(owner));
+		}
+
+        template <typename TFunctor>
+		void emplace_char_callback(const TFunctor* functor)
+		{
+			add_char_callback(CharCallback::from(functor));
+		}
 
     private:
         static bool pv_handle_callback_ret(size_t, bool e_handled) noexcept;
         static void pv_proc_button_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
         static void pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
         
-        template <typename TWindowEventSubtype>
-        OMNI_CONSTEXPR auto& pv_deduce_callbacks()
-        {
-            if constexpr (std::is_same<TWindowEventSubtype, ButtonDownEvent*>::value)
-                return button_down_callbacks_;
-
-            else if constexpr (std::is_same<TWindowEventSubtype, ButtonUpEvent*>::value)
-                return button_up_callbacks_;
-
-            else if constexpr (std::is_same<TWindowEventSubtype, KeyDownEvent*>::value)
-                return key_down_callbacks_;
-
-            else if constexpr (std::is_same<TWindowEventSubtype, KeyUpEvent*>::value)
-                return key_up_callbacks_;
-
-            else if constexpr (std::is_same<TWindowEventSubtype, CharEvent*>::value)
-                return char_callbacks_;
-        }
-
         HWND hwnd_;
         MulticastDelegate<bool(ButtonDownEvent*)> button_down_callbacks_;
         MulticastDelegate<bool(ButtonUpEvent*)> button_up_callbacks_;
