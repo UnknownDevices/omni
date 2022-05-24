@@ -20,154 +20,154 @@
 
 namespace Omni
 {
-	template<typename TRet, typename ...TParams>
-	class MulticastDelegate<TRet(TParams...)> final : private DelegateBase<TRet(TParams...)>
+template<typename TRet, typename ...TParams>
+class MulticastDelegate<TRet(TParams...)> final : private DelegateBase<TRet(TParams...)>
+{
+public:
+	using Value = Delegate<TRet(TParams...)>;
+
+	constexpr MulticastDelegate() = default;
+	MulticastDelegate(const MulticastDelegate&) = delete;
+
+	~MulticastDelegate()
 	{
-	public:
-		using Value = Delegate<TRet(TParams...)>;
+		for (auto& elem : invocations)
+			delete elem;
 
-		constexpr MulticastDelegate() = default;
-		MulticastDelegate(const MulticastDelegate&) = delete;
+		invocations.clear();
+	}
 
-		~MulticastDelegate()
+	bool is_null() const
+	{
+		return invocations.size() < 1;
+	}
+
+	bool operator==(void* ptr) const
+	{
+		return (ptr == nullptr) && this->is_null();
+	}
+
+	bool operator!=(void* ptr) const
+	{
+		return (ptr != nullptr) || (!this->is_null());
+	}
+
+	size_t size() const
+	{
+		return invocations.size();
+	}
+
+	MulticastDelegate& operator=(const MulticastDelegate&) = delete;
+
+	bool operator==(const MulticastDelegate& other) const
+	{
+		if (invocations.size() != other.invocations.size()) return false;
+		auto otherIt = other.invocations.begin();
+		for (auto it = invocations.begin(); it != invocations.end(); ++it)
+			if (**it != **otherIt) return false;
+		return true;
+	}
+
+	bool operator!=(const MulticastDelegate& other) const
+	{
+		return !(*this == other);
+	}
+
+	bool operator==(const Delegate<TRet(TParams...)>& other) const
+	{
+		if (is_null() && other.is_null()) return true;
+		if (other.is_null() || (size() != 1)) return false;
+		return (other.invocation == **invocations.begin());
+	}
+
+	bool operator!=(const Delegate<TRet(TParams...)>& other) const
+	{
+		return !(*this == other);
+	}
+
+	MulticastDelegate& operator+=(const MulticastDelegate& other)
+	{
+		for (auto& elem : other.invocations)
+			this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(elem->owner, elem->stub));
+		return *this;
+	}
+
+	MulticastDelegate& operator+=(const Delegate<TRet(TParams...)>& other)
+	{
+		if (other.is_null()) return *this;
+		this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(other.invocation.owner, other.invocation.stub));
+		return *this;
+	}
+
+	void operator()(TParams... params) const
+	{
+		for (auto& elem : invocations)
+			(*(elem->stub))(elem->owner, params...);
+	}
+
+	template<typename THandler>
+	void operator()(TParams... params, THandler handler) const
+	{
+		size_t index = 0;
+		for (auto& elem : invocations)
 		{
-			for (auto& elem : invocations) 
-				delete elem;
-			
-			invocations.clear();
+			TRet inv_ret = (*(elem->stub))(elem->owner, params...);
+			if (!handler(index, inv_ret))
+				break;
+
+			++index;
 		}
+	}
 
-		bool is_null() const
-		{
-			return invocations.size() < 1;
-		}
+	void operator()(TParams... params, Delegate<bool(size_t, TRet)> handler) const
+	{
+		operator()<decltype(handler)>(params..., handler);
+	}
 
-		bool operator==(void* ptr) const
-		{
-			return (ptr == nullptr) && this->is_null();
-		}
+	void operator()(TParams... params, std::function<bool(size_t, TRet)> handler) const
+	{
+		operator()<decltype(handler)>(params..., handler);
+	}
 
-		bool operator!=(void* ptr) const
-		{
-			return (ptr != nullptr) || (!this->is_null());
-		}
+	void add(const MulticastDelegate& other)
+	{
+		for (auto& elem : other.invocations)
+			this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(elem->owner, elem->stub));
+	}
 
-		size_t size() const
-		{
-			return invocations.size();
-		}
+	void add(const Delegate<TRet(TParams...)>& other)
+	{
+		if (other.is_null()) return *this;
+		this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(other.invocation.owner, other.invocation.stub));
+	}
 
-		MulticastDelegate& operator=(const MulticastDelegate&) = delete;
+	template <TRet(*TFn)(TParams...)>
+	static void emplace()
+	{
+		Value(nullptr, Value::template function_stub<TFn>);
+	}
 
-		bool operator==(const MulticastDelegate& other) const
-		{
-			if (invocations.size() != other.invocations.size()) return false;
-			auto otherIt = other.invocations.begin();
-			for (auto it = invocations.begin(); it != invocations.end(); ++it)
-				if (**it != **otherIt) return false;
-			return true;
-		}
+	template <class TOwner, TRet(TOwner::* TMth)(TParams...)>
+	static void emplace(TOwner* owner)
+	{
+		Value(owner, Value::template method_stub<TOwner, TMth>);
+	}
 
-		bool operator!=(const MulticastDelegate& other) const
-		{
-			return !(*this == other);
-		}
+	template <class TOwner, TRet(TOwner::* TMth)(TParams...) const>
+	static void emplace(const TOwner* owner)
+	{
+		Value(const_cast<TOwner*>(owner),
+			Value:: template const_method_stub<TOwner, TMth>);
+	}
 
-		bool operator==(const Delegate<TRet(TParams...)>& other) const
-		{
-			if (is_null() && other.is_null()) return true;
-			if (other.is_null() || (size() != 1)) return false;
-			return (other.invocation == **invocations.begin());
-		}
+	template <typename TFunctor>
+	static void emplace(const TFunctor* functor)
+	{
+		Value(const_cast<TFunctor*>(functor),
+			Value::template onst_method_stub<TFunctor, &TFunctor::operator()>);
+	}
 
-		bool operator!=(const Delegate<TRet(TParams...)>& other) const
-		{
-			return !(*this == other);
-		}
-
-		MulticastDelegate& operator+=(const MulticastDelegate& other)
-		{
-			for (auto& elem : other.invocations)
-				this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(elem->owner, elem->stub));
-			return *this;
-		}
-
-		MulticastDelegate& operator+=(const Delegate<TRet(TParams...)>& other)
-		{
-			if (other.is_null()) return *this;
-			this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(other.invocation.owner, other.invocation.stub));
-			return *this;
-		}
-
-		void operator()(TParams... params) const
-		{
-			for (auto& elem : invocations)
-				(*(elem->stub))(elem->owner, params...);
-		}
-
-		template<typename THandler>
-		void operator()(TParams... params, THandler handler) const
-		{
-			size_t index = 0;
-			for (auto& elem : invocations)
-			{
-				TRet inv_ret = (*(elem->stub))(elem->owner, params...);
-				if (!handler(index, inv_ret))
-					break;
-
-				++index;
-			}
-		}
-
-		void operator()(TParams... params, Delegate<bool(size_t, TRet)> handler) const
-		{
-			operator()<decltype(handler)>(params..., handler);
-		}
-
-		void operator()(TParams... params, std::function<bool(size_t, TRet)> handler) const
-		{
-			operator()<decltype(handler)>(params..., handler);
-		}
-
-		void add(const MulticastDelegate& other)
-		{
-			for (auto& elem : other.invocations)
-				this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(elem->owner, elem->stub));
-		}
-
-		void add(const Delegate<TRet(TParams...)>& other)
-		{
-			if (other.is_null()) return *this;
-			this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(other.invocation.owner, other.invocation.stub));
-		}
-
-		template <TRet(*TFn)(TParams...)>
-		static void emplace()
-		{
-			Value(nullptr, Value::template function_stub<TFn>);
-		}
-
-		template <class TOwner, TRet(TOwner::*TMth)(TParams...)>
-		static void emplace(TOwner* owner)
-		{
-			Value(owner, Value::template method_stub<TOwner, TMth>);
-		}
-
-		template <class TOwner, TRet(TOwner::*TMth)(TParams...) const>
-		static void emplace(const TOwner* owner)
-		{
-			Value(const_cast<TOwner*>(owner), 
-				Value:: template const_method_stub<TOwner, TMth>);
-		}
-
-		template <typename TFunctor>
-		static void emplace(const TFunctor* functor)
-		{
-			Value(const_cast<TFunctor*>(functor),
-				Value::template onst_method_stub<TFunctor, &TFunctor::operator()>);
-		}
-
-	private:
-		std::vector<typename DelegateBase<TRet(TParams...)>::InvocationElement*> invocations;
-	};
+private:
+	std::vector<typename DelegateBase<TRet(TParams...)>::InvocationElement*> invocations;
+};
 }

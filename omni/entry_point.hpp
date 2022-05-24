@@ -24,7 +24,7 @@ int wmain(/**int argc, wchar_t** argv**/)
 	auto wnd = Window();
 	wnd.start(wnd_resources);
 
-//----TESTING--------------------------------------------------------------------------------------
+	//----TESTING----------------------------------------------------------------------------------
 	auto app = App();
 	auto button_down_event = ButtonDownEvent(1, 2, 3);
 
@@ -38,7 +38,7 @@ int wmain(/**int argc, wchar_t** argv**/)
 	wnd.emplace_button_up_callback<App, &App::on_button_up>(&app);
 	wnd.emplace_key_down_callback(&on_key_down);
 	wnd.emplace_key_up_callback<&on_key_up>();
-//-------------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------
 
 	while (Window::poll_msg());
 

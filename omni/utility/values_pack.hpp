@@ -8,31 +8,31 @@ class Values_Pack<Value, vals_front, vals_tail...>
 {
 public:
 	consteval
-	Values_Pack() noexcept = default;
+		Values_Pack() noexcept = default;
 
 	constexpr static auto array = std::array<Value, sizeof...(vals_tail) + 1>({vals_front, vals_tail...});
 	constexpr static auto front = vals_front;
-	
+
 	template<Value ... concats> consteval
-	auto operator+(Values_Pack<Value, concats...>) const
+		auto operator+(Values_Pack<Value, concats...>) const
 	{
-			return Values_Pack<Value, vals_front, vals_tail..., concats...>();
+		return Values_Pack<Value, vals_front, vals_tail..., concats...>();
 	}
 
 	/*template<size_t ... indexes, auto = 0, Value ... filters>
 	static auto filter(Values_Pack<size_t, indexes...>, Values_Pack<Value, filters...>)
 	{
-		return 
+		return
 	}*/
 
 	consteval
-	static auto get_front()
+		static auto get_front()
 	{
 		return Values_Pack<Value, vals_front>();
 	}
 
 	consteval
-	static auto get_tail()
+		static auto get_tail()
 	{
 		return Values_Pack<Value, vals_tail...>();
 	}
@@ -43,31 +43,31 @@ class Values_Pack<Value>
 {
 public:
 	consteval
-	Values_Pack() noexcept = default;
+		Values_Pack() noexcept = default;
 
 	constexpr static auto array = std::array<Value, 0>();
 
 	template<Value ... concats> consteval
-	auto operator+(Values_Pack<Value, concats...>) const
+		auto operator+(Values_Pack<Value, concats...>) const
 	{
-			return Values_Pack<Value, concats...>();
+		return Values_Pack<Value, concats...>();
 	}
-	
+
 	consteval
-	static auto get_front()
+		static auto get_front()
 	{
 		return Values_Pack<Value>();
 	}
 
 	consteval
-	static auto get_tail()
+		static auto get_tail()
 	{
 		return Values_Pack<Value>();
 	}
 };
 
 template<typename Integer_Sequence>
-struct Values_Pack_Inst_From_Integer_Sequence_Inst; 
+struct Values_Pack_Inst_From_Integer_Sequence_Inst;
 
 template<typename Integer, Integer ... integers>
 struct Values_Pack_Inst_From_Integer_Sequence_Inst<std::integer_sequence<Integer, integers...>>

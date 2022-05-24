@@ -12,14 +12,14 @@
 
 namespace Omni
 {
-    inline const char* format_win32_error(DWORD error)
-    {
-        thread_local char msg_buf[OMNI_WINAPI_MAX_STR];
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK | 
-            FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, HRESULT_FROM_WIN32(error), 
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-            reinterpret_cast<LPTSTR>(msg_buf), OMNI_WINAPI_MAX_STR, nullptr);
+inline const char* format_win32_error(DWORD error)
+{
+    thread_local char msg_buf[OMNI_WINAPI_MAX_STR];
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK |
+        FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, HRESULT_FROM_WIN32(error),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        reinterpret_cast<LPTSTR>(msg_buf), OMNI_WINAPI_MAX_STR, nullptr);
 
-        return msg_buf;
-    }
+    return msg_buf;
+}
 }
