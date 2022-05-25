@@ -42,12 +42,12 @@ namespace Omni
 
 			bool operator==(const InvocationElement& other) const
 			{
-				return other.stub == stub && other.owner == owner;
+				return stub == other.stub && owner == other.owner;
 			}
 
 			bool operator!=(const InvocationElement& other) const
 			{
-				return other.stub != stub || other.owner != owner;
+				return stub != other.stub || owner != other.owner;
 			}
 
 			void* owner = nullptr;

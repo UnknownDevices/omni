@@ -1,5 +1,4 @@
-/*
-
+ /*
 	Copyright (C) 2017 by Sergey A Kryukov: derived work
 	http://www.OmniKryukov.org
 	http://www.codeproject.com/Members/OmniKryukov
@@ -12,7 +11,6 @@
 	http://en.wikipedia.org/wiki/MIT_License
 
 	Original publication: https://www.codeproject.com/Articles/1170503/The-Impossibly-Fast-Cplusplus-Delegates-Fixed
-
 */
 
 #pragma once
@@ -32,8 +30,9 @@ template<typename TRet, typename ... TParams>
 class Delegate<TRet(TParams...)> final : private DelegateBase<TRet(TParams...)>
 {
 public:
-	using Args        = TypesPack<TRet, TParams...>;
+	using Base        = DelegateBase<TRet(TParams...)>;  
 
+	using Args        = TypesPack<TRet, TParams...>;
 	using Ret         = TRet;
 	using Params      = TypesPack<TParams...>;
 
@@ -45,27 +44,25 @@ public:
 
 	friend class MulticastDelegate<TRet(TParams...)>;
 
-	Delegate() = default;
-
-	Delegate(const Delegate& other)
+	constexpr Delegate() noexcept
 	{
-		other.invocation.clone(invocation);
+		invocation_.owner = nullptr;
+		invocation_.stub = &null_stub;
 	}
 
-	template <typename TFunctor>
-	Delegate(const TFunctor& functor)
-	{
-		assign((void*)(&functor), const_method_stub<TFunctor, &TFunctor::operator()>);
+	constexpr Delegate(const Delegate& other)
+	{ 
+		other.invocation_.clone(invocation_);
 	}
 
 	bool is_null() const
 	{
-		return invocation.stub == nullptr;
+		return invocation_.stub == nullptr;
 	}
 
 	Delegate& operator=(const Delegate& other)
 	{
-		other.invocation.clone(invocation);
+		other.invocation_.clone(invocation_);
 		return *this;
 	}
 
@@ -76,29 +73,22 @@ public:
 		return *this;
 	}
 
-	bool operator==(void* ptr) const
-	{
-		return (ptr == nullptr) && this->is_null();
-	}
-
 	bool operator==(const Delegate& other) const
 	{
-		return invocation == other.invocation;
+		return invocation_ == other.invocation_;
 	}
 
 	bool operator==(const MulticastDelegate<TRet(TParams...)>& other) const
 	{
-		return other == (*this);
-	}
+		if (other.size() != 1)
+			return false;
 
-	bool operator!=(void* ptr) const
-	{
-		return (ptr != nullptr) || (!this->is_null());
+		return *this == other[0];
 	}
 
 	bool operator!=(const Delegate& other) const
 	{
-		return invocation != other.invocation;
+		return invocation_ != other.invocation_;
 	}
 
 	bool operator!=(const MulticastDelegate<TRet(TParams...)>& other) const
@@ -106,19 +96,19 @@ public:
 		return other != (*this);
 	}
 
-	template <TRet(*TFn)(TParams...)>
+	template <Function TFn>
 	static Delegate from()
 	{
 		return Delegate(nullptr, function_stub<TFn>);
 	}
 
-	template <class TOwner, TRet(TOwner::* TMth)(TParams...)>
+	template <class TOwner, Method<TOwner> TMth>
 	static Delegate from(TOwner* owner)
 	{
 		return Delegate(owner, method_stub<TOwner, TMth>);
 	}
 
-	template <class TOwner, TRet(TOwner::* TMth)(TParams...) const>
+	template <class TOwner, ConstMethod<TOwner> TMth>
 	static Delegate from(const TOwner* owner)
 	{
 		return Delegate(const_cast<TOwner*>(owner), const_method_stub<TOwner, TMth>);
@@ -133,46 +123,48 @@ public:
 
 	TRet operator()(TParams... params) const
 	{
-		return (*invocation.stub)(invocation.owner, params...);
+		return (*invocation_.stub)(invocation_.owner, params...);
 	}
 
 private:
-	Delegate(void* owner, DelegateBase<TRet(TParams...)>::stub_type stub)
+	Delegate(void* owner, Base::stub_type stub) : invocation_(owner, stub)
+	{}
+
+	void assign(void* owner, Base::stub_type stub)
 	{
-		invocation.owner = owner;
-		invocation.stub = stub;
+		invocation_.owner = owner;
+		invocation_.stub = stub;
 	}
 
-	void assign(void* owner, DelegateBase<TRet(TParams...)>::stub_type stub)
-	{
-		this->invocation.owner = owner;
-		this->invocation.stub = stub;
-	}
-
-	template <TRet(*TFn)(TParams...)>
+	template <Function TFn>
 	static TRet function_stub(void*, TParams... params)
 	{
 		return (TFn)(params...);
 	}
 
-	template <class TOwner, TRet(TOwner::* TMth)(TParams...)>
+	template <class TOwner, Method<TOwner> TMth>
 	static TRet method_stub(void* owner, TParams... params)
 	{
 		TOwner* p = static_cast<TOwner*>(owner);
 		return (p->*TMth)(params...);
 	}
 
-	template <class TOwner, TRet(TOwner::* TMth)(TParams...) const>
+	template <class TOwner, ConstMethod<TOwner> TMth>
 	static TRet const_method_stub(void* owner, TParams... params)
 	{
 		const TOwner* p = static_cast<TOwner*>(owner);
 		return (p->*TMth)(params...);
 	}
 
-	DelegateBase<TRet(TParams...)>::InvocationElement invocation;
+	static TRet null_stub(void*, TParams...)
+	{
+		return TRet();
+	}
+
+	Base::InvocationElement invocation_;
 };
 
-template<typename Type>
+template<typename T>
 struct IsDelegate : std::false_type
 {};
 

@@ -12,6 +12,9 @@ bool on_key_up(Omni::KeyUpEvent* key_up_event)
 	return false;
 }
 
+void foo()
+{}
+
 int wmain(/**int argc, wchar_t** argv**/)
 {
 	using namespace Omni;
@@ -25,6 +28,15 @@ int wmain(/**int argc, wchar_t** argv**/)
 	wnd.start(wnd_resources);
 
 	//----TESTING----------------------------------------------------------------------------------
+	auto mult_del1 = MulticastDelegate<void()>();
+	auto mult_del2 = MulticastDelegate<void()>();
+
+	auto del1 = Delegate<void()>::from<&foo>();
+	auto del2 = Delegate<void()>::from<&foo>();
+
+	mult_del1.emplace<&foo>();
+	mult_del2.emplace<&foo>();
+
 	auto app = App();
 	auto button_down_event = ButtonDownEvent(1, 2, 3);
 

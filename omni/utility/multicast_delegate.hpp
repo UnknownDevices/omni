@@ -1,5 +1,4 @@
 /*
-
 	Copyright (C) 2017 by Sergey A Kryukov: derived work
 	http://www.SAKryukov.org
 	http://www.codeproject.com/Members/SAKryukov
@@ -12,7 +11,6 @@
 	http://en.wikipedia.org/wiki/MIT_License
 
 	Original publication: https://www.codeproject.com/Articles/1170503/The-Impossibly-Fast-Cplusplus-Delegates-Fixed
-
 */
 
 #pragma once
@@ -24,48 +22,50 @@ template<typename TRet, typename ...TParams>
 class MulticastDelegate<TRet(TParams...)> final : private DelegateBase<TRet(TParams...)>
 {
 public:
-	using Value = Delegate<TRet(TParams...)>;
+	using Value         = Delegate<TRet(TParams...)>;
 
-	constexpr MulticastDelegate() = default;
-	MulticastDelegate(const MulticastDelegate&) = delete;
+	using Args        = TypesPack<TRet, TParams...>;
+	using Ret         = TRet;
+	using Params      = TypesPack<TParams...>;
+	
+	using Iterator      = std::vector<Value>::iterator;
+	using ConstIterator = std::vector<Value>::const_iterator;
 
-	~MulticastDelegate()
+	constexpr MulticastDelegate() noexcept = default;
+	~MulticastDelegate() noexcept = default;
+ 
+ 	Iterator begin() noexcept { return dels_.begin(); }
+	Iterator end() noexcept { return dels_.end(); }
+
+	ConstIterator begin() const noexcept { return dels_.begin(); }
+	ConstIterator end() const noexcept { return dels_.end(); }
+
+	ConstIterator cbegin() const noexcept { return dels_.cbegin(); }
+	ConstIterator cend() const noexcept { return dels_.cend(); }
+
+	bool empty() const
 	{
-		for (auto& elem : invocations)
-			delete elem;
-
-		invocations.clear();
-	}
-
-	bool is_null() const
-	{
-		return invocations.size() < 1;
-	}
-
-	bool operator==(void* ptr) const
-	{
-		return (ptr == nullptr) && this->is_null();
-	}
-
-	bool operator!=(void* ptr) const
-	{
-		return (ptr != nullptr) || (!this->is_null());
+		return dels_.empty();
 	}
 
 	size_t size() const
 	{
-		return invocations.size();
+		return dels_.size();
 	}
 
-	MulticastDelegate& operator=(const MulticastDelegate&) = delete;
+	MulticastDelegate& operator=(const MulticastDelegate&) = default;
 
 	bool operator==(const MulticastDelegate& other) const
 	{
-		if (invocations.size() != other.invocations.size()) return false;
-		auto otherIt = other.invocations.begin();
-		for (auto it = invocations.begin(); it != invocations.end(); ++it)
-			if (**it != **otherIt) return false;
-		return true;
+		return dels_ == other.dels_;
+	}
+
+	bool operator==(const Value& other) const
+	{
+		if (size() != 1)
+			return false;
+
+		return get(0) == other;
 	}
 
 	bool operator!=(const MulticastDelegate& other) const
@@ -73,45 +73,52 @@ public:
 		return !(*this == other);
 	}
 
-	bool operator==(const Delegate<TRet(TParams...)>& other) const
-	{
-		if (is_null() && other.is_null()) return true;
-		if (other.is_null() || (size() != 1)) return false;
-		return (other.invocation == **invocations.begin());
-	}
-
-	bool operator!=(const Delegate<TRet(TParams...)>& other) const
+	bool operator!=(const Value& other) const
 	{
 		return !(*this == other);
 	}
 
-	MulticastDelegate& operator+=(const MulticastDelegate& other)
+	MulticastDelegate& operator+=(const MulticastDelegate& target)
 	{
-		for (auto& elem : other.invocations)
-			this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(elem->owner, elem->stub));
+		add(target);
 		return *this;
 	}
 
-	MulticastDelegate& operator+=(const Delegate<TRet(TParams...)>& other)
+	MulticastDelegate& operator+=(const Value& target)
 	{
-		if (other.is_null()) return *this;
-		this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(other.invocation.owner, other.invocation.stub));
+		add(target);
 		return *this;
+	}
+
+	MulticastDelegate& operator-=(const Value& target)
+	{
+		remove(target);
+		return *this;
+	}
+
+	Value& operator[](size_t index)
+	{
+		return get(index);
+	}
+
+	const Value& operator[](size_t index) const
+	{
+		return get(index);
 	}
 
 	void operator()(TParams... params) const
 	{
-		for (auto& elem : invocations)
-			(*(elem->stub))(elem->owner, params...);
+		for (auto& elem : *this)
+			elem(params...);
 	}
 
 	template<typename THandler>
 	void operator()(TParams... params, THandler handler) const
 	{
 		size_t index = 0;
-		for (auto& elem : invocations)
+		for (auto& elem : *this)
 		{
-			TRet inv_ret = (*(elem->stub))(elem->owner, params...);
+			TRet inv_ret = elem(params...);
 			if (!handler(index, inv_ret))
 				break;
 
@@ -119,47 +126,76 @@ public:
 		}
 	}
 
-	void add(const MulticastDelegate& other)
+	Value& get(size_t index)
 	{
-		for (auto& elem : other.invocations)
-			this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(elem->owner, elem->stub));
+		return dels_[index];
 	}
 
-	void add(const Delegate<TRet(TParams...)>& other)
+	const Value& get(size_t index) const
 	{
-		if (other.is_null())
-			return;
-			
-		this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(other.invocation.owner, other.invocation.stub));
+		return dels_[index];
+	}
+
+	void add(const Value& target)
+	{
+		dels_.push_back(target);
+	}
+
+	void add(const MulticastDelegate& target)
+	{
+		for (auto& elem : target)
+			add(elem);
 	}
 
 	template <Value::Function TFn>
 	void emplace()
 	{
-		add(Value(nullptr, Value::template function_stub<TFn>));
+		add(Value::template from<TFn>());
 	}
 
 	template <class TOwner, Value::template Method<TOwner> TMth>
 	void emplace(TOwner* owner)
 	{
-		add(Value(owner, Value::template method_stub<TOwner, TMth>));
+		add(Value::template from<TOwner, TMth>(owner));
 	}
 
 	template <class TOwner, Value::template ConstMethod<TOwner> TMth>
 	void emplace(const TOwner* owner)
-	{
-		add(Value(const_cast<TOwner*>(owner),
-			Value:: template const_method_stub<TOwner, TMth>));
+ 	{
+		add(Value::template from<TOwner, TMth>(owner));
 	}
 
 	template <typename TFunctor>
 	void emplace(const TFunctor* functor)
 	{
-		add(Value(const_cast<TFunctor*>(functor),
-			Value::template onst_method_stub<TFunctor, &TFunctor::operator()>));
+		add(Value::from(functor));
+	}
+
+	void remove(const Value& target)
+	{
+		dels_.erase(target);
+	}
+
+	void clear()
+	{
+		dels_.clear();
 	}
 
 private:
-	std::vector<typename DelegateBase<TRet(TParams...)>::InvocationElement*> invocations;
+	std::vector<Value> dels_;
+};
+
+template<typename T>
+struct IsMulticastDelegate : std::false_type
+{};
+
+template <typename TRet, typename ... TParams>
+struct IsMulticastDelegate<MulticastDelegate<TRet(TParams...)>> : std::true_type
+{};
+
+template <typename TArgsF, typename ... TArgsT>
+struct Instantiate<MulticastDelegate, TypesPack<TArgsF, TArgsT...>>
+{
+	using Type = MulticastDelegate<TArgsF(TArgsT...)>;
 };
 }

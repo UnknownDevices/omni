@@ -13,8 +13,8 @@ public:
 	constexpr static auto array = std::array<Value, sizeof...(vals_tail) + 1>({vals_front, vals_tail...});
 	constexpr static auto front = vals_front;
 
-	template<Value ... concats> consteval
-		auto operator+(Values_Pack<Value, concats...>) const
+	template<Value ... concats>
+	consteval auto operator+(Values_Pack<Value, concats...>) const
 	{
 		return Values_Pack<Value, vals_front, vals_tail..., concats...>();
 	}
