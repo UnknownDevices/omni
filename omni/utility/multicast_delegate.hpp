@@ -119,16 +119,6 @@ public:
 		}
 	}
 
-	void operator()(TParams... params, Delegate<bool(size_t, TRet)> handler) const
-	{
-		operator()<decltype(handler)>(params..., handler);
-	}
-
-	void operator()(TParams... params, std::function<bool(size_t, TRet)> handler) const
-	{
-		operator()<decltype(handler)>(params..., handler);
-	}
-
 	void add(const MulticastDelegate& other)
 	{
 		for (auto& elem : other.invocations)
@@ -137,34 +127,36 @@ public:
 
 	void add(const Delegate<TRet(TParams...)>& other)
 	{
-		if (other.is_null()) return *this;
+		if (other.is_null())
+			return;
+			
 		this->invocations.push_back(new typename DelegateBase<TRet(TParams...)>::InvocationElement(other.invocation.owner, other.invocation.stub));
 	}
 
-	template <TRet(*TFn)(TParams...)>
-	static void emplace()
+	template <Value::Function TFn>
+	void emplace()
 	{
-		Value(nullptr, Value::template function_stub<TFn>);
+		add(Value(nullptr, Value::template function_stub<TFn>));
 	}
 
-	template <class TOwner, TRet(TOwner::* TMth)(TParams...)>
-	static void emplace(TOwner* owner)
+	template <class TOwner, Value::template Method<TOwner> TMth>
+	void emplace(TOwner* owner)
 	{
-		Value(owner, Value::template method_stub<TOwner, TMth>);
+		add(Value(owner, Value::template method_stub<TOwner, TMth>));
 	}
 
-	template <class TOwner, TRet(TOwner::* TMth)(TParams...) const>
-	static void emplace(const TOwner* owner)
+	template <class TOwner, Value::template ConstMethod<TOwner> TMth>
+	void emplace(const TOwner* owner)
 	{
-		Value(const_cast<TOwner*>(owner),
-			Value:: template const_method_stub<TOwner, TMth>);
+		add(Value(const_cast<TOwner*>(owner),
+			Value:: template const_method_stub<TOwner, TMth>));
 	}
 
 	template <typename TFunctor>
-	static void emplace(const TFunctor* functor)
+	void emplace(const TFunctor* functor)
 	{
-		Value(const_cast<TFunctor*>(functor),
-			Value::template onst_method_stub<TFunctor, &TFunctor::operator()>);
+		add(Value(const_cast<TFunctor*>(functor),
+			Value::template onst_method_stub<TFunctor, &TFunctor::operator()>));
 	}
 
 private:
