@@ -1,5 +1,6 @@
 #pragma once
 
+#include <omni/core.hpp>
 #include <omni/utility/values_pack.hpp>
 
 namespace Omni
@@ -32,9 +33,9 @@ template <typename LeftsPack, typename RightsPack>
 	requires IsPack<LeftsPack>::value&& IsPack<RightsPack>::value
 struct SplitPack
 {
-	constexpr static auto left  = LeftsPack();
-	constexpr static auto right = RightsPack();
-	constexpr static auto whole = LeftsPack() + RightsPack();
+	OMNI_CONSTEXPR static auto left  = LeftsPack();
+	OMNI_CONSTEXPR static auto right = RightsPack();
+	OMNI_CONSTEXPR static auto whole = LeftsPack() + RightsPack();
 };
 
 template <typename... Lefts, auto = 0, typename... Rights>

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <omni/core.hpp>
+
 namespace Omni
 {
 	template<typename T>
@@ -30,7 +32,7 @@ namespace Omni
 
 		struct InvocationElement
 		{
-			constexpr InvocationElement() = default;
+			OMNI_CONSTEXPR InvocationElement() = default;
 			InvocationElement(void* owner, stub_type stub) : owner(owner), stub(stub)
 			{}
 

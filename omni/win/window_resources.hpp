@@ -25,7 +25,7 @@ public:
     }
 
 private:
-    constexpr static size_t s_begin = 5;
+    OMNI_CONSTEXPR static size_t s_begin = 5;
     inline static std::string s_class_name = "omni-";
     ATOM atom_;
 };

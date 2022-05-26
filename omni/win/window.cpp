@@ -132,12 +132,12 @@ LRESULT CALLBACK Window::proc_wnd_creation_msgs(HWND hwnd, UINT msg_type, WPARAM
 
 bool Window::peek_msg()
 {
-    thread_local MSG msg;
+    thread_local auto msg = MSG();
     if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
     {
         if (msg.message == WM_QUIT)
         {
-            quit = true;
+            quit_is_requested = true;
             return true;
         }
 
@@ -154,7 +154,7 @@ bool Window::peek_msg()
 void Window::make(WindowResources& wnd_resources, const char* title, int x, int y,
     int width, int height, DWORD style)
 {
-    RECT size;
+    auto size = RECT();
     size.top = 0;
     size.bottom = height;
     size.left = 0;

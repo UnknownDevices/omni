@@ -14,6 +14,8 @@
 */
 
 #pragma once
+
+#include <omni/core.hpp>
 #include <omni/utility/delegate.hpp>
 
 namespace Omni
@@ -31,7 +33,7 @@ public:
 	using Iterator      = std::vector<Value>::iterator;
 	using ConstIterator = std::vector<Value>::const_iterator;
 
-	constexpr MulticastDelegate() noexcept = default;
+	OMNI_CONSTEXPR MulticastDelegate() noexcept = default;
 	~MulticastDelegate() noexcept = default;
  
  	Iterator begin() noexcept { return dels_.begin(); }

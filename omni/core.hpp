@@ -65,7 +65,7 @@ typedef uint_least16_t uint16_least;
 typedef uint_least32_t uint32_least;
 typedef uint_least64_t uint64_least;
 
-inline bool quit;
+inline bool quit_is_requested;
 
 #if OMNI_STATIC
 inline HINSTANCE exe_hinst;
@@ -75,23 +75,23 @@ inline HINSTANCE exe_hinst;
 inline HINSTANCE omni_hinst;
 #endif
 
-constexpr auto make_bit_flag(auto x) noexcept
+OMNI_CONSTEXPR auto make_bit_flag(auto x) noexcept
 {
     return 1U << x;
 }
 
-constexpr uint8* as_byte_arr(auto* x) noexcept
+OMNI_CONSTEXPR uint8* as_byte_arr(auto* x) noexcept
 {
     return static_cast<char*>(static_cast<void*>(&x));
 }
 
-constexpr uint8* as_byte_arr(const auto* x) noexcept
+OMNI_CONSTEXPR uint8* as_byte_arr(const auto* x) noexcept
 {
     return static_cast<char*>(static_cast<void*>(&x));
 }
 
 template<typename TSource>
-constexpr TSource get_bit_range(TSource source, auto begin, auto end) noexcept
+OMNI_CONSTEXPR TSource get_bit_range(TSource source, auto begin, auto end) noexcept
 {
     TSource mask = ~(~TSource(0) << (end - begin));
     return (source >> begin) & mask;

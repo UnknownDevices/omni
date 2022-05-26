@@ -1,5 +1,7 @@
 #pragma once
 
+#include <omni/core.hpp>
+
 template<typename Value, Value ... vals>
 class Values_Pack;
 
@@ -10,8 +12,8 @@ public:
 	consteval
 		Values_Pack() noexcept = default;
 
-	constexpr static auto array = std::array<Value, sizeof...(vals_tail) + 1>({vals_front, vals_tail...});
-	constexpr static auto front = vals_front;
+	OMNI_CONSTEXPR static auto array = std::array<Value, sizeof...(vals_tail) + 1>({vals_front, vals_tail...});
+	OMNI_CONSTEXPR static auto front = vals_front;
 
 	template<Value ... concats>
 	consteval auto operator+(Values_Pack<Value, concats...>) const
@@ -45,7 +47,7 @@ public:
 	consteval
 		Values_Pack() noexcept = default;
 
-	constexpr static auto array = std::array<Value, 0>();
+	OMNI_CONSTEXPR static auto array = std::array<Value, 0>();
 
 	template<Value ... concats> consteval
 		auto operator+(Values_Pack<Value, concats...>) const

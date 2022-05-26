@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include <omni/core.hpp>
 #include <omni/utility/delegate_base.hpp>
 #include <omni/utility/types_pack.hpp>
 
@@ -44,13 +45,13 @@ public:
 
 	friend class MulticastDelegate<TRet(TParams...)>;
 
-	constexpr Delegate() noexcept
+	OMNI_CONSTEXPR Delegate() noexcept
 	{
 		invocation_.owner = nullptr;
 		invocation_.stub = &null_stub;
 	}
 
-	constexpr Delegate(const Delegate& other)
+	OMNI_CONSTEXPR Delegate(const Delegate& other)
 	{ 
 		other.invocation_.clone(invocation_);
 	}

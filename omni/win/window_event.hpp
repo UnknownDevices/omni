@@ -9,7 +9,7 @@ namespace Omni
 class ButtonDownEvent
 {
 public:
-    constexpr ButtonDownEvent(int16 x, int16 y, uint8 mods) noexcept :
+    OMNI_CONSTEXPR ButtonDownEvent(int16 x, int16 y, uint8 mods) noexcept :
         x_(x),
         y_(y),
         mods_(mods)
@@ -38,7 +38,7 @@ private:
 class ButtonUpEvent
 {
 public:
-    constexpr ButtonUpEvent(int16 x, int16 y, uint8 mods) noexcept :
+    OMNI_CONSTEXPR ButtonUpEvent(int16 x, int16 y, uint8 mods) noexcept :
         x_(x),
         y_(y),
         mods_(mods)
@@ -67,7 +67,7 @@ private:
 class KeyDownEvent
 {
 public:
-    constexpr KeyDownEvent(uint16 key_code, uint16 scan_code, uint16 repeat_count,
+    OMNI_CONSTEXPR KeyDownEvent(uint16 key_code, uint16 scan_code, uint16 repeat_count,
         uint8 is_hold, uint8 is_extended_key) noexcept :
         key_code_(key_code),
         scan_code_(scan_code),
@@ -109,7 +109,7 @@ private:
 class KeyUpEvent
 {
 public:
-    constexpr KeyUpEvent(uint16 key_code, uint16 scan_code, uint8 is_extended_key) noexcept :
+    OMNI_CONSTEXPR KeyUpEvent(uint16 key_code, uint16 scan_code, uint8 is_extended_key) noexcept :
         key_code_(key_code),
         scan_code_(scan_code),
         is_extended_key_(is_extended_key)
@@ -138,7 +138,7 @@ private:
 class CharEvent
 {
 public:
-    constexpr CharEvent(char character_code, uint8 is_hold) noexcept :
+    OMNI_CONSTEXPR CharEvent(char character_code, uint8 is_hold) noexcept :
         character_code_(character_code),
         is_hold_(is_hold)
     {}
@@ -163,7 +163,7 @@ template<>
 struct fmt::formatter<Omni::ButtonDownEvent>
 {
     template<typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    OMNI_CONSTEXPR auto parse(ParseContext& ctx)
     {
         return ctx.begin();
     }
@@ -185,7 +185,7 @@ template<>
 struct fmt::formatter<Omni::ButtonUpEvent>
 {
     template<typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    OMNI_CONSTEXPR auto parse(ParseContext& ctx)
     {
         return ctx.begin();
     }
@@ -207,7 +207,7 @@ template<>
 struct fmt::formatter<Omni::KeyDownEvent>
 {
     template<typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    OMNI_CONSTEXPR auto parse(ParseContext& ctx)
     {
         return ctx.begin();
     }
@@ -233,7 +233,7 @@ template<>
 struct fmt::formatter<Omni::KeyUpEvent>
 {
     template<typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    OMNI_CONSTEXPR auto parse(ParseContext& ctx)
     {
         return ctx.begin();
     }
@@ -255,7 +255,7 @@ template<>
 struct fmt::formatter<Omni::CharEvent>
 {
     template<typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    OMNI_CONSTEXPR auto parse(ParseContext& ctx)
     {
         return ctx.begin();
     }

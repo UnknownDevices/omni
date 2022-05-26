@@ -17,7 +17,7 @@ public:
 	using KeyUpCallback      = Delegate<bool(KeyUpEvent*)>;
 	using CharCallback       = Delegate<bool(CharEvent*)>;
 
-	static constexpr DWORD DefaultStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+	static OMNI_CONSTEXPR DWORD DefaultStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 
 	OMNI_CONSTEXPR Window() noexcept = default;
 	OMNI_CONSTEXPR ~Window() noexcept = default;

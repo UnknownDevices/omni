@@ -46,6 +46,7 @@ list(APPEND OMNI_H_FILES
     omni/utility/delegate_base.hpp
     omni/utility/multicast_delegate.hpp
     omni/random/shuffle_bag.hpp
+    omni/win/graphics.hpp
     omni/win/window.hpp
     omni/win/window_event.hpp
     omni/win/window_resources.hpp
@@ -56,6 +57,7 @@ list(APPEND OMNI_C_FILES
     #*.cpp
     omni/core.cpp
     omni/logger.cpp
+    omni/win/graphics.cpp
     omni/win/window.cpp
     omni/win/window_resources.cpp
 )
