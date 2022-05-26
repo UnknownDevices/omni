@@ -20,7 +20,7 @@ LRESULT CALLBACK Window::proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM wparam, 
     {
         case WM_DESTROY:
         {
-            get_user_data(hwnd).stop();
+            get_user_data(hwnd).destroy();
             return 0;
         }
         case WM_PAINT:
@@ -151,7 +151,7 @@ bool Window::peek_msg()
     }
 }
 
-void Window::start(WindowResources& wnd_resources, const char* title, int x, int y,
+void Window::make(WindowResources& wnd_resources, const char* title, int x, int y,
     int width, int height, DWORD style)
 {
     RECT size;
@@ -170,15 +170,15 @@ void Window::start(WindowResources& wnd_resources, const char* title, int x, int
     success = ShowWindowAsync(hwnd_, SW_SHOW);
     omni_assert_win32_call(success, ShowWindowAsync);
 
-    running_ = true;
+    is_null_ = false;
 }
 
-void Window::stop()
+void Window::destroy()
 {
     bool success = DestroyWindow(hwnd_);
     omni_assert_win32_call(success, DestroyWindow);
 
-    running_ = false;
+    is_null_ = true;
 }
 
 bool Window::pv_handle_callback_ret(size_t, bool e_handled) noexcept

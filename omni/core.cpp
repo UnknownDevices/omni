@@ -1,7 +1,9 @@
 #include <omni/core.hpp>
 
+#include <omni/win/window_resources.hpp>
+#include <omni/win/window.hpp>
 #include <omni/logger.hpp>
-
+ 
 namespace Omni
 {
 void init()
@@ -28,5 +30,19 @@ HMODULE get_this_module_handle()
         (LPCTSTR)get_this_module_handle, &hmodule);
 
     return hmodule;
+}
+
+void run()
+{
+    auto wnd_resources = WindowResources();
+    wnd_resources.make();
+
+    auto wnd = Window();
+    wnd.make(wnd_resources);
+
+    while (!wnd.is_null())
+        Window::peek_msg();
+
+    wnd_resources.destroy();
 }
 }

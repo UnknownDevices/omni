@@ -98,6 +98,7 @@ constexpr TSource get_bit_range(TSource source, auto begin, auto end) noexcept
 }
 
 void OMNI_API init();
+void OMNI_API run();
 
 HMODULE OMNI_API get_this_module_handle();
 }

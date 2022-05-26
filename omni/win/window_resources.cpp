@@ -29,7 +29,7 @@ void WindowResources::increment(std::string& str, size_t begin_i, bool allow_res
     }
 }
 
-void WindowResources::start()
+void WindowResources::make()
 {
     increment(s_class_name, 5);
 
@@ -52,7 +52,7 @@ void WindowResources::start()
     omni_assert_win32_call(atom_, RegisterClassEx);
 }
 
-void WindowResources::stop()
+void WindowResources::destroy()
 {
     bool success = UnregisterClass((LPCSTR)atom_, omni_hinst);
     omni_assert_win32_call(success, UnregisterClass);

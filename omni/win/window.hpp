@@ -29,18 +29,18 @@ public:
 		LPARAM lparam);
 
 	static bool peek_msg();
-	void start(WindowResources& wnd_resources,
+	void make(WindowResources& wnd_resources,
 		const char* title = "Omni Window",
 		int x = CW_USEDEFAULT,
 		int y = CW_USEDEFAULT,
 		int width = 720,
 		int height = 480,
 		DWORD style = DefaultStyle);
-	void stop();
+	void destroy();
 
-	bool is_running() const noexcept
+	bool is_null() const noexcept
 	{
-		return running_;
+		return is_null_;
 	}
 
 	void add_button_down_callback(ButtonDownCallback callback)
@@ -187,7 +187,7 @@ private:
 	static void pv_proc_button_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
 	static void pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
 
-	bool running_;
+	bool is_null_;
 	HWND hwnd_;
 	MulticastDelegate<bool(ButtonDownEvent*)> button_down_callbacks_;
 	MulticastDelegate<bool(ButtonUpEvent*)> button_up_callbacks_;

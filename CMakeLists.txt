@@ -40,7 +40,6 @@ list(APPEND OMNI_H_FILES
     omni/core.hpp
     omni/config.h
     omni/logger.hpp
-    omni/app.hpp
     omni/utility/types_pack.hpp
     omni/utility/values_pack.hpp
     omni/utility/delegate.hpp
