@@ -65,6 +65,8 @@ typedef uint_least16_t uint16_least;
 typedef uint_least32_t uint32_least;
 typedef uint_least64_t uint64_least;
 
+inline bool quit;
+
 #if OMNI_STATIC
 inline HINSTANCE exe_hinst;
 inline HINSTANCE& omni_hinst = exe_hinst;

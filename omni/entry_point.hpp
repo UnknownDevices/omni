@@ -52,7 +52,8 @@ int wmain(/**int argc, wchar_t** argv**/)
 	wnd.emplace_key_up_callback<&on_key_up>();
 	//---------------------------------------------------------------------------------------------
 
-	while (Window::poll_msg());
+	while (wnd.is_running())
+		Window::peek_msg();
 
 	wnd_resources.stop();
 

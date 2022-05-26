@@ -6,7 +6,7 @@ namespace Omni
 {
 void init()
 {
-    Logger::init();
+    quit = false;
 
 #if OMNI_STATIC
     // TODO: Look into GetModuleHandleEx
@@ -16,6 +16,7 @@ void init()
     omni_hinst = get_this_module_handle();
 #endif
 
+    Logger::init();
     trace_log("Initialized successfully.");
 }
 

@@ -20,8 +20,7 @@ LRESULT CALLBACK Window::proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM wparam, 
     {
         case WM_DESTROY:
         {
-            auto& wnd = *reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-            wnd.stop();
+            get_user_data(hwnd).stop();
             return 0;
         }
         case WM_PAINT:
@@ -131,19 +130,25 @@ LRESULT CALLBACK Window::proc_wnd_creation_msgs(HWND hwnd, UINT msg_type, WPARAM
     return DefWindowProc(hwnd, msg_type, w_param, l_param);
 }
 
-bool Window::poll_msg()
+bool Window::peek_msg()
 {
-    static MSG msg;
+    thread_local MSG msg;
     if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
     {
         if (msg.message == WM_QUIT)
-            return false;
+        {
+            quit = true;
+            return true;
+        }
 
         TranslateMessage(&msg);
         DispatchMessage(&msg);
+        return true;
     }
-
-    return true;
+    else
+    {
+        return false;
+    }
 }
 
 void Window::start(WindowResources& wnd_resources, const char* title, int x, int y,
@@ -164,13 +169,16 @@ void Window::start(WindowResources& wnd_resources, const char* title, int x, int
 
     success = ShowWindowAsync(hwnd_, SW_SHOW);
     omni_assert_win32_call(success, ShowWindowAsync);
+
+    running_ = true;
 }
 
 void Window::stop()
 {
     bool success = DestroyWindow(hwnd_);
     omni_assert_win32_call(success, DestroyWindow);
-    PostQuitMessage(0);
+
+    running_ = false;
 }
 
 bool Window::pv_handle_callback_ret(size_t, bool e_handled) noexcept

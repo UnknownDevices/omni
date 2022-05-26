@@ -28,8 +28,7 @@ public:
 	static LRESULT CALLBACK proc_wnd_creation_msgs(HWND hwnd, UINT msg_type, WPARAM wparam,
 		LPARAM lparam);
 
-	static bool poll_msg();
-
+	static bool peek_msg();
 	void start(WindowResources& wnd_resources,
 		const char* title = "Omni Window",
 		int x = CW_USEDEFAULT,
@@ -38,6 +37,11 @@ public:
 		int height = 480,
 		DWORD style = DefaultStyle);
 	void stop();
+
+	bool is_running() const noexcept
+	{
+		return running_;
+	}
 
 	void add_button_down_callback(ButtonDownCallback callback)
 	{
@@ -183,6 +187,7 @@ private:
 	static void pv_proc_button_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
 	static void pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
 
+	bool running_;
 	HWND hwnd_;
 	MulticastDelegate<bool(ButtonDownEvent*)> button_down_callbacks_;
 	MulticastDelegate<bool(ButtonUpEvent*)> button_up_callbacks_;
