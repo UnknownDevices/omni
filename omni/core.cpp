@@ -34,9 +34,11 @@ void run()
     wnd_resources.make();
     wnd.make(wnd_resources);
 
+	Omni::trace_log("Started rendering thread.");
     auto render_thread = std::thread([&](){
         gfx.make(wnd);
 
+	    Omni::trace_log("Entered rendering loop.");
         while (!wnd.is_null())
         {
             gfx.start_frame();
@@ -48,19 +50,20 @@ void run()
 
             gfx.end_frame();
         }
-	    Omni::trace_log("Exited rendering loop");
+	    Omni::trace_log("Exited rendering loop.");
 
         gfx.destroy();
     }); 
 
+	Omni::trace_log("Entered message proc loop.");
     while (!wnd.is_null())
         Window::peek_msg();
-	Omni::trace_log("Exited message loop.");
+	Omni::trace_log("Exited message proc loop.");
 
     wnd_resources.destroy();
 
     render_thread.join();
-	Omni::trace_log("Joined rendering thread");
+	Omni::trace_log("Joined rendering thread.");
 }
 
 HMODULE get_this_module_handle()
