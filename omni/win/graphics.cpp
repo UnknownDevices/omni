@@ -21,7 +21,7 @@ void Graphics::make(const Window& wnd)
     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     sd.Flags = 0;
 
-    D3D11CreateDeviceAndSwapChain(
+    auto hres = D3D11CreateDeviceAndSwapChain(
         nullptr,
         D3D_DRIVER_TYPE_HARDWARE,
         nullptr,
@@ -34,15 +34,18 @@ void Graphics::make(const Window& wnd)
         &device_,
         nullptr,
         &context_);
+    omni_assert_win32_call(SUCCEEDED(hres), D3D11CreateDeviceAndSwapChain);
 
     ID3D11Resource* back_buffer;
-    get_swap_chain().GetBuffer(0, __uuidof(ID3D11Resource),
+    hres = get_swap_chain().GetBuffer(0, __uuidof(ID3D11Resource),
         reinterpret_cast<void**>(&back_buffer));
+    omni_assert_win32_call(SUCCEEDED(hres), IDXGISwapChain::GetBuffer);
 
-    get_device().CreateRenderTargetView(
+    hres = get_device().CreateRenderTargetView(
         back_buffer,
         nullptr,
         &target_view_);
+    omni_assert_win32_call(SUCCEEDED(hres), ID3D11Device::CreateRenderTargetView);
 
     back_buffer->Release();
 }
@@ -63,7 +66,8 @@ void Graphics::start_frame() const
 
 void Graphics::end_frame() const
 {
-    get_swap_chain().Present(1, 0);
+    auto hres = get_swap_chain().Present(1, 0);
+    omni_assert_win32_call(SUCCEEDED(hres), IDXGISwapChain::Present);
 }
 
 void Graphics::clear_buffer(float r, float g, float b, float o) const
