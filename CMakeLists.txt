@@ -161,7 +161,7 @@ target_link_libraries(omni
     PUBLIC  
     spdlog::spdlog
     magic_enum::magic_enum
-    D3d12.dll
+    # D3d12.dll
     D3d11.dll
 )
 

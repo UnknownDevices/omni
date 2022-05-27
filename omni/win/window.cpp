@@ -20,7 +20,9 @@ LRESULT CALLBACK Window::proc_wnd_msgs(HWND hwnd, UINT msg_type, WPARAM wparam, 
     {
         case WM_DESTROY:
         {
-            get_user_data(hwnd).destroy();
+            auto& wnd = get_user_data(hwnd);
+
+            wnd.is_null_ = true;
             return 0;
         }
         case WM_PAINT:
@@ -177,8 +179,6 @@ void Window::destroy()
 {
     bool success = DestroyWindow(hwnd_);
     omni_assert_win32_call(success, DestroyWindow);
-
-    is_null_ = true;
 }
 
 bool Window::pv_handle_callback_ret(size_t, bool e_handled) noexcept

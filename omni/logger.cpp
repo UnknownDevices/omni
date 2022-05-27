@@ -7,7 +7,7 @@ void Logger::init()
     spdlog::set_pattern("%^[%T] %n: %v%$");
     spdlog_logger_ = spdlog::stdout_color_mt("OMNI");
     spdlog_logger_->set_level(spdlog::level::trace);
-    trace_log("Logger initialized successfully.");
+    trace_log("Initialized logger.");
 }
 
 void Logger::log(Logger::Level level, fmt::string_view msg)

@@ -17,7 +17,8 @@ public:
 	using KeyUpCallback      = Delegate<bool(KeyUpEvent*)>;
 	using CharCallback       = Delegate<bool(CharEvent*)>;
 
-	static OMNI_CONSTEXPR DWORD DefaultStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+	static OMNI_CONSTEXPR DWORD DefaultStyle = WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | 
+		WS_MINIMIZEBOX;
 
 	OMNI_CONSTEXPR Window() noexcept = default;
 	OMNI_CONSTEXPR ~Window() noexcept = default;
@@ -182,17 +183,22 @@ public:
 		add_char_callback(CharCallback::from(functor));
 	}
 
+	HWND get_hwnd() const
+	{
+		return hwnd_; 
+	}
+
 private:
 	static bool pv_handle_callback_ret(size_t, bool e_handled) noexcept;
 	static void pv_proc_button_down_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
 	static void pv_proc_button_up_msg(HWND hwnd, WPARAM wparam, LPARAM lparam);
 
-	bool is_null_;
-	HWND hwnd_;
+	HWND                                      hwnd_;
 	MulticastDelegate<bool(ButtonDownEvent*)> button_down_callbacks_;
-	MulticastDelegate<bool(ButtonUpEvent*)> button_up_callbacks_;
-	MulticastDelegate<bool(KeyDownEvent*)> key_down_callbacks_;
-	MulticastDelegate<bool(KeyUpEvent*)> key_up_callbacks_;
-	MulticastDelegate<bool(CharEvent*)> char_callbacks_;
+	MulticastDelegate<bool(ButtonUpEvent*)>   button_up_callbacks_;
+	MulticastDelegate<bool(KeyDownEvent*)>    key_down_callbacks_;
+	MulticastDelegate<bool(KeyUpEvent*)>      key_up_callbacks_;
+	MulticastDelegate<bool(CharEvent*)>       char_callbacks_;
+	bool is_null_;
 };
 }
