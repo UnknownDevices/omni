@@ -43,6 +43,10 @@ public:
     }
 
 private:
+    void pv_create_device_and_swap_chain(const DXGI_SWAP_CHAIN_DESC& sd);
+    void pv_get_back_buffer(ID3D11Resource** back_buffer);
+    void pv_create_render_target_view(ID3D11Resource* buffer);
+
     ID3D11Device*           device_;
     IDXGISwapChain*         swap_chain_;
     ID3D11DeviceContext*    context_;

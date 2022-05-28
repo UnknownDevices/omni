@@ -7,6 +7,9 @@ namespace Omni
 {
 using Error = uint32;
 
+constexpr Error Error_OutOfMemory                 = 1;
+constexpr Error Error_D3D11NotInstalledDebugLayer = 2;
+
 class ErrorState
 {
 public:

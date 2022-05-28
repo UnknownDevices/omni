@@ -29,6 +29,8 @@
 #define OMNI_CONSTEVAL consteval
 #define OMNI_NODISCARD [[nodiscard]]
 #define OMNI_INLINE inline
+#define omni_stringify(x) omni_xstringify(x)
+#define omni_xstringify(x) #x
 
 #if OMNI_DISABLE_FORCEINLINE
 #define OMNI_FORCEINLINE inline

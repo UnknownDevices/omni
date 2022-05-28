@@ -85,8 +85,8 @@ void soft_assert(std::string_view file, uint32_fast line, bool to_assert, const 
     if (to_assert)
         return;
 
-    Logger::log(Logger::Level::Error,
-        fmt::format("Soft assertion failed at: [{}][{}] with message: [{}].", file, line,
+    Logger::log(Logger::Level::Warn,
+        fmt::format("[{0}][{1}]: Assertion Failed: [{2}].", file, line,
         msg));
 
 #if OMNI_BREAK_ON_FAILED_SOFT_ASSERTS
@@ -101,7 +101,7 @@ void hard_assert(std::string_view file, uint32_fast line, bool to_assert, const 
         return;
 
     Logger::log(Logger::Level::Error,
-        fmt::format("Hard assertion failed at: [{}][{}] with message: [{}].", file, line,
+        fmt::format("[{0}][{1}]: Assertion Failed: [{2}].", file, line,
         msg));
 
 #if OMNI_BREAK_ON_FAILED_HARD_ASSERTS
@@ -165,7 +165,7 @@ void soft_assert(std::string_view file, uint32_fast line, bool to_assert,
         return;
 
     Logger::log(Logger::Level::Error,
-        fmt::format("Soft assertion failed at: [{}][{}] with message: [{}].", file, line,
+        fmt::format("[{0}][{1}]: Assertion Failed: [{2}].", file, line,
         fmt::vformat(msg_fmt, fmt::make_format_args(msg_args...))));
 
 #if OMNI_BREAK_ON_FAILED_SOFT_ASSERTS
@@ -181,7 +181,7 @@ void hard_assert(std::string_view file, uint32_fast line, bool to_assert,
         return;
 
     Logger::log(Logger::Level::Error,
-        fmt::format("Hard assertion failed at: [{}][{}] with message: [{}].", file, line,
+        fmt::format("[{0}][{1}]: Assertion Failed: [{2}].", file, line,
         fmt::vformat(msg_fmt, fmt::make_format_args(msg_args...))));
 
 #if OMNI_BREAK_ON_FAILED_HARD_ASSERTS

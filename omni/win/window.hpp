@@ -199,6 +199,6 @@ private:
 	MulticastDelegate<bool(KeyDownEvent*)>    key_down_callbacks_;
 	MulticastDelegate<bool(KeyUpEvent*)>      key_up_callbacks_;
 	MulticastDelegate<bool(CharEvent*)>       char_callbacks_;
-	bool is_null_;
+	bool is_null_ = true; // Debug only?
 };
 }

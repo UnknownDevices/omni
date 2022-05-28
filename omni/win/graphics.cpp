@@ -1,9 +1,12 @@
 #include <omni/win/graphics.hpp>
+#include <omni/error.hpp>
 
 namespace Omni
 {
 void Graphics::make(const Window& wnd)
 {
+    omni_hard_assert(!wnd.is_null(), "[{}]", omni_stringify(!wnd.is_null()));
+
     auto sd = DXGI_SWAP_CHAIN_DESC();
     sd.BufferDesc.Width = 0;
     sd.BufferDesc.Height = 0;
@@ -21,31 +24,18 @@ void Graphics::make(const Window& wnd)
     sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
     sd.Flags = 0;
 
-    auto hres = D3D11CreateDeviceAndSwapChain(
-        nullptr,
-        D3D_DRIVER_TYPE_HARDWARE,
-        nullptr,
-        D3D11_CREATE_DEVICE_DEBUG,
-        nullptr,
-        0,
-        D3D11_SDK_VERSION,
-        &sd,
-        &swap_chain_,
-        &device_,
-        nullptr,
-        &context_);
-    omni_assert_win32_call(SUCCEEDED(hres), D3D11CreateDeviceAndSwapChain);
+    pv_create_device_and_swap_chain(sd);
+    if (!error_state.is_null())
+        return;
 
     ID3D11Resource* back_buffer;
-    hres = this->swap_chain_->GetBuffer(0, __uuidof(ID3D11Resource),
-        reinterpret_cast<void**>(&back_buffer));
-    omni_assert_win32_call(SUCCEEDED(hres), IDXGISwapChain::GetBuffer);
+    pv_get_back_buffer(&back_buffer);
+    if (!error_state.is_null())
+        return;
 
-    hres = this->device_->CreateRenderTargetView(
-        back_buffer,
-        nullptr,
-        &target_view_);
-    omni_assert_win32_call(SUCCEEDED(hres), ID3D11Device::CreateRenderTargetView);
+    pv_create_render_target_view(back_buffer);
+    if (!error_state.is_null())
+        return;
 
     back_buffer->Release();
 }
@@ -71,5 +61,92 @@ void Graphics::clear_buffer(float r, float g, float b, float o) const
 {
     const float color[4] = {r, g, b, o};
     context_->ClearRenderTargetView(target_view_, color);
+}
+
+void Graphics::pv_create_device_and_swap_chain(const DXGI_SWAP_CHAIN_DESC& sd)
+{
+    auto hres = D3D11CreateDeviceAndSwapChain(
+        nullptr,
+        D3D_DRIVER_TYPE_HARDWARE,
+        nullptr,
+        D3D11_CREATE_DEVICE_DEBUG,
+        nullptr,
+        0,
+        D3D11_SDK_VERSION,
+        &sd,
+        &swap_chain_,
+        &device_,
+        nullptr,
+        &context_);
+
+    switch (hres)
+    {
+        case S_OK:
+        {
+            return;
+        }
+        case E_OUTOFMEMORY:
+        {
+            error_state.post_error(Error_OutOfMemory);
+            return;
+        }
+        case E_FAIL:
+        {
+            error_state.post_error(Error_D3D11NotInstalledDebugLayer);
+            return;
+        }
+        default:
+        {
+            __debugbreak(); 
+        }
+    }
+}
+
+void Graphics::pv_get_back_buffer(ID3D11Resource** back_buffer)
+{
+    auto hres = this->swap_chain_->GetBuffer(0, __uuidof(ID3D11Resource),
+        reinterpret_cast<void**>(back_buffer));
+
+    switch (hres)
+    {
+        case S_OK:
+        {
+            return;
+        }
+        case E_OUTOFMEMORY:
+        {
+            error_state.post_error(Error_OutOfMemory);
+            return;
+        }
+        default:
+        {
+            __debugbreak(); 
+        }
+    }
+}
+
+void Graphics::pv_create_render_target_view(ID3D11Resource* buffer)
+{
+    auto hres = this->device_->CreateRenderTargetView(
+        buffer,
+        nullptr,
+        &target_view_);
+
+    switch (hres)
+    {
+        case S_OK:
+        {
+            return;
+        }
+        case E_OUTOFMEMORY:
+        {
+            error_state.post_error(Error_OutOfMemory);
+            return;
+        }
+        default:
+        {
+            __debugbreak(); 
+        }
+    }
 }
 }
