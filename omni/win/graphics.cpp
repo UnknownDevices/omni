@@ -1,5 +1,4 @@
 #include <omni/win/graphics.hpp>
-#include <comdef.h>
 
 namespace Omni
 {

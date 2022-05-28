@@ -4,6 +4,7 @@
 #include <omni/win/window.hpp>
 #include <omni/win/graphics.hpp>
 #include <omni/logger.hpp>
+#include <omni/error.hpp>
 
 namespace Omni
 {
@@ -29,7 +30,6 @@ void run()
 
     auto wnd_resources = WindowResources();
     auto wnd           = Window();
-    auto gfx           = Graphics();
 
     wnd_resources.make();
     wnd.make(wnd_resources);
@@ -37,6 +37,7 @@ void run()
     Omni::trace_log("Started rendering thread.");
     auto render_thread = std::thread([&]()
     {
+        auto gfx = Graphics();
         gfx.make(wnd);
 
         Omni::trace_log("Entered rendering loop.");

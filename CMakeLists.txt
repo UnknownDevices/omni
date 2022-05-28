@@ -39,6 +39,7 @@ list(APPEND OMNI_H_FILES
     omni/entry_point.hpp
     omni/core.hpp
     omni/config.h
+    omni/error.hpp
     omni/logger.hpp
     omni/utility/types_pack.hpp
     omni/utility/values_pack.hpp
