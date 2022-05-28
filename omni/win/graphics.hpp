@@ -22,22 +22,22 @@ public:
 
     void clear_buffer(float r, float g, float b, float o = 1.0f) const;
 
-    ID3D11Device& get_device() const
+    ID3D11Device& device() const
     {
         return *device_;
     }
 
-    IDXGISwapChain& get_swap_chain() const
+    IDXGISwapChain& swap_chain() const
     {
         return *swap_chain_;
     }
 
-    ID3D11DeviceContext& get_context() const
+    ID3D11DeviceContext& context() const
     {
         return *context_;
     }
 
-    ID3D11RenderTargetView& get_target_view() const
+    ID3D11RenderTargetView& target_view() const
     {
         return *target_view_;
     }

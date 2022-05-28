@@ -19,7 +19,7 @@ public:
     void make();
     void destroy();
 
-    ATOM get_atom() const
+    ATOM atom() const
     {
         return atom_;
     }

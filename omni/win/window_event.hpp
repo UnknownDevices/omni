@@ -17,17 +17,17 @@ public:
 
     OMNI_NODISCARD OMNI_CONSTEXPR int16 get_x() const noexcept
     {
-        return x_;
+        return this->x_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR int16 get_y() const noexcept
     {
-        return y_;
+        return this->y_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR uint8 get_mods() const noexcept
     {
-        return mods_;
+        return this->mods_;
     }
 
 private:
@@ -46,17 +46,17 @@ public:
 
     OMNI_NODISCARD OMNI_CONSTEXPR int16 get_x() const noexcept
     {
-        return x_;
+        return this->x_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR int16 get_y() const noexcept
     {
-        return y_;
+        return this->y_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR uint8 get_mods() const noexcept
     {
-        return mods_;
+        return this->mods_;
     }
 
 private:
@@ -78,27 +78,27 @@ public:
 
     OMNI_NODISCARD OMNI_CONSTEXPR uint16 get_key_code() const noexcept
     {
-        return key_code_;
+        return this->key_code_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR uint16 get_scan_code() const noexcept
     {
-        return scan_code_;
+        return this->scan_code_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR uint16 get_repeat_count() const noexcept
     {
-        return repeat_count_;
+        return this->repeat_count_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR bool is_hold() const noexcept
     {
-        return is_hold_;
+        return this->is_hold_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR bool is_extended_key() const noexcept
     {
-        return is_extended_key_;
+        return this->is_extended_key_;
     }
 
 private:
@@ -117,17 +117,17 @@ public:
 
     OMNI_NODISCARD OMNI_CONSTEXPR uint16 get_key_code() const noexcept
     {
-        return key_code_;
+        return this->key_code_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR uint16 get_scan_code() const noexcept
     {
-        return scan_code_;
+        return this->scan_code_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR bool is_extended_key() const noexcept
     {
-        return is_extended_key_;
+        return this->is_extended_key_;
     }
 
 private:
@@ -145,12 +145,12 @@ public:
 
     OMNI_NODISCARD OMNI_CONSTEXPR char get_character_code() const noexcept
     {
-        return character_code_;
+        return this->character_code_;
     }
 
     OMNI_NODISCARD OMNI_CONSTEXPR bool is_hold() const noexcept
     {
-        return is_hold_;
+        return this->is_hold_;
     }
 
 private:

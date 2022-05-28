@@ -46,144 +46,144 @@ public:
 
 	void add_button_down_callback(ButtonDownCallback callback)
 	{
-		button_down_callbacks_ += callback;
+		this->button_down_callbacks_ += callback;
 	}
 
 	void add_button_up_callback(ButtonUpCallback callback)
 	{
-		button_up_callbacks_ += callback;
+		this->button_up_callbacks_ += callback;
 	}
 
 	void add_key_down_callback(KeyDownCallback callback)
 	{
-		key_down_callbacks_ += callback;
+		this->key_down_callbacks_ += callback;
 	}
 
 	void add_key_up_callback(KeyUpCallback callback)
 	{
-		key_up_callbacks_ += callback;
+		this->key_up_callbacks_ += callback;
 	}
 
 	void add_char_callback(CharCallback callback)
 	{
-		char_callbacks_ += callback;
+		this->char_callbacks_ += callback;
 	}
 
 	template <ButtonDownCallback::Function TFn>
 	void emplace_button_down_callback()
 	{
-		add_button_down_callback(ButtonDownCallback::from<TFn>());
+		this->add_button_down_callback(ButtonDownCallback::from<TFn>());
 	}
 
 	template <class TOwner, ButtonDownCallback::Method<TOwner> TMth>
 	void emplace_button_down_callback(TOwner* owner)
 	{
-		add_button_down_callback(ButtonDownCallback::from<TOwner, TMth>(owner));
+		this->add_button_down_callback(ButtonDownCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <class TOwner, ButtonDownCallback::ConstMethod<TOwner> TMth>
 	void emplace_button_down_callback(const TOwner* owner)
 	{
-		add_button_down_callback(ButtonDownCallback::from<TOwner, TMth>(owner));
+		this->add_button_down_callback(ButtonDownCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <typename TFunctor>
 	void emplace_button_down_callback(const TFunctor* functor)
 	{
-		add_button_down_callback(ButtonDownCallback::from(functor));
+		this->add_button_down_callback(ButtonDownCallback::from(functor));
 	}
 
 	template <ButtonUpCallback::Function TFn>
 	void emplace_button_up_callback()
 	{
-		add_button_up_callback(ButtonUpCallback::from<TFn>());
+		this->add_button_up_callback(ButtonUpCallback::from<TFn>());
 	}
 
 	template <class TOwner, ButtonUpCallback::Method<TOwner> TMth>
 	void emplace_button_up_callback(TOwner* owner)
 	{
-		add_button_up_callback(ButtonUpCallback::from<TOwner, TMth>(owner));
+		this->add_button_up_callback(ButtonUpCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <class TOwner, ButtonUpCallback::ConstMethod<TOwner> TMth>
 	void emplace_button_up_callback(const TOwner* owner)
 	{
-		add_button_up_callback(ButtonUpCallback::from<TOwner, TMth>(owner));
+		this->add_button_up_callback(ButtonUpCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <typename TFunctor>
 	void emplace_button_up_callback(const TFunctor* functor)
 	{
-		add_button_up_callback(ButtonUpCallback::from(functor));
+		this->add_button_up_callback(ButtonUpCallback::from(functor));
 	}
 
 	template <KeyDownCallback::Function TFn>
 	void emplace_key_down_callback()
 	{
-		add_key_down_callback(KeyDownCallback::from<TFn>());
+		this->add_key_down_callback(KeyDownCallback::from<TFn>());
 	}
 
 	template <class TOwner, KeyDownCallback::Method<TOwner> TMth>
 	void emplace_key_down_callback(TOwner* owner)
 	{
-		add_key_down_callback(KeyDownCallback::from<TOwner, TMth>(owner));
+		this->add_key_down_callback(KeyDownCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <class TOwner, KeyDownCallback::ConstMethod<TOwner> TMth>
 	void emplace_key_down_callback(const TOwner* owner)
 	{
-		add_key_down_callback(KeyDownCallback::from<TOwner, TMth>(owner));
+		this->add_key_down_callback(KeyDownCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <typename TFunctor>
 	void emplace_key_down_callback(const TFunctor* functor)
 	{
-		add_key_down_callback(KeyDownCallback::from(functor));
+		this->add_key_down_callback(KeyDownCallback::from(functor));
 	}
 
 	template <KeyUpCallback::Function TFn>
 	void emplace_key_up_callback()
 	{
-		add_key_up_callback(KeyUpCallback::from<TFn>());
+		this->add_key_up_callback(KeyUpCallback::from<TFn>());
 	}
 
 	template <class TOwner, KeyUpCallback::Method<TOwner> TMth>
 	void emplace_key_up_callback(TOwner* owner)
 	{
-		add_key_up_callback(KeyUpCallback::from<TOwner, TMth>(owner));
+		this->add_key_up_callback(KeyUpCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <class TOwner, KeyUpCallback::ConstMethod<TOwner> TMth>
 	void emplace_key_up_callback(const TOwner* owner)
 	{
-		add_key_up_callback(KeyUpCallback::from<TOwner, TMth>(owner));
+		this->add_key_up_callback(KeyUpCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <CharCallback::Function TFn>
 	void emplace_char_callback()
 	{
-		add_char_callback(CharCallback::from<TFn>());
+		this->add_char_callback(CharCallback::from<TFn>());
 	}
 
 	template <class TOwner, CharCallback::Method<TOwner> TMth>
 	void emplace_char_callback(TOwner* owner)
 	{
-		add_char_callback(CharCallback::from<TOwner, TMth>(owner));
+		this->add_char_callback(CharCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <class TOwner, CharCallback::ConstMethod<TOwner> TMth>
 	void emplace_char_callback(const TOwner* owner)
 	{
-		add_char_callback(CharCallback::from<TOwner, TMth>(owner));
+		this->add_char_callback(CharCallback::from<TOwner, TMth>(owner));
 	}
 
 	template <typename TFunctor>
 	void emplace_char_callback(const TFunctor* functor)
 	{
-		add_char_callback(CharCallback::from(functor));
+		this->add_char_callback(CharCallback::from(functor));
 	}
 
-	HWND get_hwnd() const
+	HWND hwnd() const
 	{
 		return hwnd_; 
 	}

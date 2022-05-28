@@ -48,13 +48,13 @@ void WindowResources::make()
     wcex.lpszClassName = s_class_name.data();
     wcex.hIconSm       = wcex.hIcon;
 
-    atom_ = RegisterClassEx(&wcex);
-    omni_assert_win32_call(atom_, RegisterClassEx);
+    this->atom_ = RegisterClassEx(&wcex);
+    omni_assert_win32_call(this->atom_, RegisterClassEx);
 }
 
 void WindowResources::destroy()
 {
-    bool success = UnregisterClass((LPCSTR)atom_, omni_hinst);
+    bool success = UnregisterClass((LPCSTR)this->atom_, omni_hinst);
     omni_assert_win32_call(success, UnregisterClass);
 }
 }

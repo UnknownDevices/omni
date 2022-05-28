@@ -16,9 +16,9 @@ void Graphics::make(const Window& wnd)
     sd.SampleDesc.Quality = 0;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     sd.BufferCount = 2;
-    sd.OutputWindow = wnd.get_hwnd();
+    sd.OutputWindow = wnd.hwnd();
     sd.Windowed = true;
-    sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL ;
+    sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
     sd.Flags = 0;
 
     auto hres = D3D11CreateDeviceAndSwapChain(
@@ -37,11 +37,11 @@ void Graphics::make(const Window& wnd)
     omni_assert_win32_call(SUCCEEDED(hres), D3D11CreateDeviceAndSwapChain);
 
     ID3D11Resource* back_buffer;
-    hres = get_swap_chain().GetBuffer(0, __uuidof(ID3D11Resource),
+    hres = this->swap_chain_->GetBuffer(0, __uuidof(ID3D11Resource),
         reinterpret_cast<void**>(&back_buffer));
     omni_assert_win32_call(SUCCEEDED(hres), IDXGISwapChain::GetBuffer);
 
-    hres = get_device().CreateRenderTargetView(
+    hres = this->device_->CreateRenderTargetView(
         back_buffer,
         nullptr,
         &target_view_);
@@ -52,25 +52,24 @@ void Graphics::make(const Window& wnd)
 
 void Graphics::destroy()
 {
-    get_target_view().Release();
-    get_context().Release();
-    get_swap_chain().Release();
-    get_device().Release();
+    this->target_view_->Release();
+    this->context_->Release();
+    this->swap_chain_->Release();
+    this->device_->Release();
 }
-
 
 void Graphics::start_frame() const
 {}
 
 void Graphics::end_frame() const
 {
-    auto hres = get_swap_chain().Present(1, 0);
+    auto hres = swap_chain_->Present(1, 0);
     omni_assert_win32_call(SUCCEEDED(hres), IDXGISwapChain::Present);
 }
 
 void Graphics::clear_buffer(float r, float g, float b, float o) const
 {
-    const float color[4] ={r, g, b, o};
-    get_context().ClearRenderTargetView(target_view_, color);
+    const float color[4] = {r, g, b, o};
+    context_->ClearRenderTargetView(target_view_, color);
 }
 }

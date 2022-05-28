@@ -18,26 +18,26 @@ public:
 
     constexpr Error error() const noexcept
     {
-        return error_;
+        return this->error_;
     }
 
     constexpr bool is_null()
     {
-        return this->error() == 0u;
+        return this->error_ == 0u;
     }
 
     constexpr void clear()
     {
-        this->set_error(0u);
+        this->error_ = 0u;
     }
 
     void post_error(Error err)
     {
-        omni_soft_assert(this->error() == 0u,
+        omni_soft_assert(this->error_ == 0u,
             "Posting new error: [{}] without first clearing previous error: [{}]",
-            err, this->error());
+            err, this->error_);
 
-        this->set_error(err);
+        this->error_ = err;
     }
 
     ErrorState& operator=(const ErrorState& other) = delete;
@@ -47,11 +47,6 @@ public:
     constexpr auto operator<=>(const ErrorState&) const = default;
 
 private:
-    constexpr void set_error(Error error) noexcept
-    {
-        error_ = error;
-    }
-
     Error error_;
 };
 

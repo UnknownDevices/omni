@@ -134,7 +134,7 @@ LRESULT CALLBACK Window::proc_wnd_creation_msgs(HWND hwnd, UINT msg_type, WPARAM
 
 bool Window::peek_msg()
 {
-    thread_local auto msg = MSG();
+    thread_local MSG msg;
     if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
     {
         if (msg.message == WM_QUIT)
@@ -165,14 +165,14 @@ void Window::make(WindowResources& wnd_resources, const char* title, int x, int 
     bool success = AdjustWindowRectEx(&size, style, false, 0);
     omni_assert_win32_call(success, AdjustWindowRectEx);
 
-    hwnd_ = CreateWindowEx(0, (LPCTSTR)wnd_resources.get_atom(), title, style, x, y,
+    this->hwnd_ = CreateWindowEx(0, (LPCTSTR)wnd_resources.atom(), title, style, x, y,
         size.right - size.left, size.bottom - size.top, nullptr, nullptr, omni_hinst, this);
-    omni_assert_win32_call(hwnd_, CreateWindowEx);
+    omni_assert_win32_call(this->hwnd_, CreateWindowEx);
 
-    success = ShowWindowAsync(hwnd_, SW_SHOW);
+    success = ShowWindowAsync(this->hwnd_, SW_SHOW);
     omni_assert_win32_call(success, ShowWindowAsync);
 
-    is_null_ = false;
+    this->is_null_ = false;
 }
 
 void Window::destroy()
